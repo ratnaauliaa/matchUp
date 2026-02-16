@@ -1,0 +1,352 @@
+[
+  {
+    "brand": "Somethinc",
+    "products": [
+      {
+        "product_name": "Copy Paste Tinted Sunscreen",
+        "image": "https://images.somethinc.com/uploads/products/thumbs/800x800/PDP-Perfect-Match-Complexion-BG-PUTIH-SS-Tinted.jpg",
+        "description": "Breakthrough Innovation SKIN TINT + SUNSCREEN with a super lightweight & breathable formula. It blurs uneven skin tone with a healthy, glowing finish while protecting your skin from UVA & UVB rays.",
+        "shades": [
+          { "shade_name": "Tiffany", "hex": "#c99770", "undertone": "Warm", "skintone": "Deep" },
+          { "shade_name": "Nina", "hex": "#e5c0a7", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "Serene", "hex": "#e3bfac", "undertone": "Cool", "skintone": "Light Medium" },
+          { "shade_name": "Goddess", "hex": "#daaf90", "undertone": "Warm", "skintone": "Tan" },
+          { "shade_name": "Alter", "hex": "#ddb090", "undertone": "Neutral", "skintone": "Tan" },
+          { "shade_name": "Coco", "hex": "#cfab84", "undertone": "Warm", "skintone": "Medium Tan" },
+          { "shade_name": "Cashew", "hex": "#ecbb90", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Perle", "hex": "#efd4cb", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Eclair", "hex": "#e2bca0", "undertone": "Cool", "skintone": "Medium Tan" },
+          { "shade_name": "Bijoux", "hex": "#e7c1a6", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "Charlotte", "hex": "#e6c2aa", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Linen", "hex": "#dcb79b", "undertone": "Neutral", "skintone": "Medium Tan" },
+          { "shade_name": "Butter", "hex": "#e8cbb9", "undertone": "Cool", "skintone": "Light Medium" },
+          { "shade_name": "Cotton", "hex": "#fbeae1", "undertone": "Cool", "skintone": "Fair" }
+        ]
+      },
+      {
+        "product_name": "HOOMAN Breathable Cushion Cover SPF 35 PA++++",
+        "image": "https://images.somethinc.com/uploads/products/thumbs/800x800/PDP_Hooman_WhiteBG.jpg",
+        "description": "HOOMAN Cushion is powered by anti-bacterial Breathable Technology and a non-oxidizing formula. Achieve Medium to High Coverage that blurs pores and fine lines in just one tap!",
+        "shades": [
+          { "shade_name": "Tiffany", "hex": "#c99770", "undertone": "Warm", "skintone": "Deep" },
+          { "shade_name": "Nina", "hex": "#e5c0a7", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "Serene", "hex": "#e3bfac", "undertone": "Cool", "skintone": "Light Medium" },
+          { "shade_name": "Goddess", "hex": "#daaf90", "undertone": "Warm", "skintone": "Tan" },
+          { "shade_name": "Alter", "hex": "#ddb090", "undertone": "Neutral", "skintone": "Tan" },
+          { "shade_name": "Coco", "hex": "#cfab84", "undertone": "Warm", "skintone": "Medium Tan" },
+          { "shade_name": "Cashew", "hex": "#ecbb90", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Perle", "hex": "#efd4cb", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Eclair", "hex": "#e2bca0", "undertone": "Cool", "skintone": "Medium Tan" },
+          { "shade_name": "Bijoux", "hex": "#e7c1a6", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "Charlotte", "hex": "#e6c2aa", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Linen", "hex": "#dcb79b", "undertone": "Neutral", "skintone": "Medium Tan" },
+          { "shade_name": "Butter", "hex": "#e8cbb9", "undertone": "Cool", "skintone": "Light Medium" },
+          { "shade_name": "Cotton", "hex": "#fbeae1", "undertone": "Cool", "skintone": "Fair" }
+        ]
+      },
+      {
+        "product_name": "Hooman Under Control HD Blur Loose Powder",
+        "image": "https://images.somethinc.com/uploads/products/thumbs/800x800/HOOMAN_UNDER_CONTROL_WEBSITE.jpg",
+        "description": "STAY MATTE, BUT NOT FLAT! EVERYTHING IS UNDER CONTROL! Achieve an instant live filter effect with our HD Blur Loose Powder. Formulated with super-fine nano particles, it locks in oil for up to 16 hours, blurs pores, and smooths skin texture effortlessly.",
+        "shades": [
+          { "shade_name": "Cotton", "hex": "#fbeae1", "undertone": "Cool", "skintone": "Fair" },
+          { "shade_name": "Perle", "hex": "#efd4cb", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Butter", "hex": "#e8cbb9", "undertone": "Cool", "skintone": "Light Medium" },
+          { "shade_name": "Bijoux", "hex": "#e7c1a6", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "Charlotte", "hex": "#e6c2aa", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Cashew", "hex": "#ecbb90", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Linen", "hex": "#dcb79b", "undertone": "Neutral", "skintone": "Medium Tan" },
+          { "shade_name": "Eclair", "hex": "#e2bca0", "undertone": "Cool", "skintone": "Medium Tan" },
+          { "shade_name": "Coco", "hex": "#cfab84", "undertone": "Warm", "skintone": "Medium Tan" },
+          { "shade_name": "Nina", "hex": "#e5c0a7", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "Serene", "hex": "#e3bfac", "undertone": "Cool", "skintone": "Light Medium" },
+          { "shade_name": "Goddess", "hex": "#daaf90", "undertone": "Warm", "skintone": "Tan" },
+          { "shade_name": "Alter", "hex": "#ddb090", "undertone": "Neutral", "skintone": "Tan" }
+        ]
+      },
+      {
+        "product_name": "Copy Paste CoverBlur Powder Foundation",
+        "image": "https://images.somethinc.com/uploads/products/thumbs/800x800/PDP-COVERBLUR-WHITEBG.jpg",
+        "description": "One swipe Coverblur! A seamless, undetectable powder foundation with a zero-cakey, zero-cracky, and zero-pore formula. It offers medium-to-full coverage that effortlessly hides imperfections, blurs pores, and smooths out skin texture.",
+        "shades": [
+          { "shade_name": "Cotton", "hex": "#fbeae1", "undertone": "Cool", "skintone": "Fair" },
+          { "shade_name": "Perle", "hex": "#efd4cb", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Butter", "hex": "#e8cbb9", "undertone": "Cool", "skintone": "Light Medium" },
+          { "shade_name": "Bijoux", "hex": "#e7c1a6", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "Charlotte", "hex": "#e6c2aa", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Cashew", "hex": "#ecbb90", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Linen", "hex": "#dcb79b", "undertone": "Neutral", "skintone": "Medium Tan" },
+          { "shade_name": "Eclair", "hex": "#e2bca0", "undertone": "Cool", "skintone": "Medium Tan" },
+          { "shade_name": "Coco", "hex": "#cfab84", "undertone": "Warm", "skintone": "Medium Tan" },
+          { "shade_name": "Nina", "hex": "#e5c0a7", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "Serene", "hex": "#e3bfac", "undertone": "Cool", "skintone": "Light Medium" },
+          { "shade_name": "Alter", "hex": "#ddb090", "undertone": "Neutral", "skintone": "Tan" },
+          { "shade_name": "Goddess", "hex": "#daaf90", "undertone": "Warm", "skintone": "Tan" },
+          { "shade_name": "Tiffany", "hex": "#c99770", "undertone": "Warm", "skintone": "Deep" }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Hanasui",
+    "products": [
+      {
+        "product_name": "Serum Cushion Soulmatte",
+        "image": "https://hanasui.id/front-end/assets/img/product_image/d8d7f7ed1914585cef1a77a7fc4bcc68.png",
+        "description": "Hanasui Serum Cushion Soulmatte is a high-performance cushion that delivers a flawless matte finish. Infused with a powerful blend of Niacinamide, Sodium Hyaluronate, and Peptides.",
+        "shades": [
+          { "shade_name": "Light", "hex": "#ebcbb1", "undertone": "Cool", "skintone": "Fair" },
+          { "shade_name": "Natural", "hex": "#ebc59f", "undertone": "Neutral", "skintone": "Light" },
+          { "shade_name": "Medium", "hex": "#f1be9d", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Pinkish", "hex": "#f2c5b9", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "Fairy Pinkish", "hex": "#f9d2c9", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Porcelain", "hex": "#ecccb5", "undertone": "Warm", "skintone": "Fair" },
+          { "shade_name": "Light Ivory", "hex": "#ecd0b8", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Creamy Beige", "hex": "#eabeac", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "Warm Sand", "hex": "#ebb695", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Classy Ivory", "hex": "#e8b49c", "undertone": "Warm", "skintone": "Medium Tan" }
+        ]
+      },
+      {
+        "product_name": "Serum Cushion",
+        "image": "https://hanasui.id/front-end/assets/img/product_image/48cbaab5b93b16c727a84066754078fc.png",
+        "description": "Hanasui Serum Cushion is a skincare-infused cushion enriched with Niacinamide, Sodium Hyaluronate, Vitamin E, and Aloe Vera Extract. Delivers a flawless makeup look with a natural dewy finish.",
+        "shades": [
+          { "shade_name": "Light", "hex": "#ebcbb1", "undertone": "Cool", "skintone": "Fair" },
+          { "shade_name": "Natural", "hex": "#ebc59f", "undertone": "Neutral", "skintone": "Light" },
+          { "shade_name": "Medium", "hex": "#f1be9d", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Pinkish", "hex": "#f2c5b9", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "Fairy Pinkish", "hex": "#f9d2c9", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Porcelain", "hex": "#ecccb5", "undertone": "Warm", "skintone": "Fair" },
+          { "shade_name": "Light Ivory", "hex": "#ecd0b8", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Creamy Beige", "hex": "#eabeac", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "Warm Sand", "hex": "#ebb695", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Classy Ivory", "hex": "#e8b49c", "undertone": "Warm", "skintone": "Medium Tan" }
+        ]
+      },
+      {
+        "product_name": "Perfect Stay Foundation",
+        "image": "https://hanasui.id/front-end/assets/img/product_image/486d1f39d2d7c39f035b2d6a84e2abf1.png",
+        "description": "Hanasui Perfect Stay Foundation is a liquid foundation with a lightweight and long-wearing formula. Powered by oil-control technology, it delivers a natural matte finish that remains transferproof throughout the day.",
+        "shades": [
+          { "shade_name": "Fair", "hex": "#f0cca0", "undertone": "Warm", "skintone": "Fair" },
+          { "shade_name": "Vanilla", "hex": "#f7cda3", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Marble", "hex": "#eebf9c", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Chiffon", "hex": "#ebb48f", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Butter Cream", "hex": "#dcb593", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Shell", "hex": "#dbad8b", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Ivory", "hex": "#dcb48b", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Beige", "hex": "#dcb18e", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Neutral", "hex": "#dcad85", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Dessert", "hex": "#dba97e", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Sand", "hex": "#dba27b", "undertone": "Cool", "skintone": "Medium" },
+          { "shade_name": "Chestnut", "hex": "#dba075", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Almond", "hex": "#daa97d", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Caramel", "hex": "#d6a379", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Truffle", "hex": "#d39b7a", "undertone": "Cool", "skintone": "Medium" },
+          { "shade_name": "Latte", "hex": "#d39771", "undertone": "Cool", "skintone": "Medium" },
+          { "shade_name": "Brownie", "hex": "#ce8c69", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Deep", "hex": "#bd8160", "undertone": "Warm", "skintone": "Medium" }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OMG",
+    "products": [
+      {
+        "product_name": "Coverlast Two Way Cake",
+        "image": "https://image.femaledaily.com/dyn/210/images/prod-pics/product_1690537981_134879_omg_800x800.jpg",
+        "description": "A high-performance combination of powder and foundation powered by the latest COLORADVANCED TECH. It delivers medium coverage and a silky-smooth finish to seamlessly mask uneven skin tone and imperfections.",
+        "shades": [
+          { "shade_name": "21W Light", "hex": "#efdbb2", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "32N Natural", "hex": "#edc8a3", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "41W Sand", "hex": "#e7b78a", "undertone": "Warm", "skintone": "Medium" }
+        ]
+      },
+      {
+        "product_name": "Coverlast Liquid Foundation",
+        "image": "https://storage.googleapis.com/6e927a7a-fad5-437f-bf8d-228eec029d0f/pLpYnalYpX_ESjnUmcuxh.png",
+        "description": "OMG Oh My Glam Coverlast Liquid Foundation is a high-coverage liquid foundation available in 6 stunning shades specifically curated to complement the diverse skin tones of Indonesian women.",
+        "shades": [
+          { "shade_name": "13C Ivory", "hex": "#ecc3b2", "undertone": "Cool", "skintone": "Fair" },
+          { "shade_name": "21W Light", "hex": "#efdbb2", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "31W Beige", "hex": "#e0c09f", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "32N Natural", "hex": "#edc8a3", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "41W Sand", "hex": "#e7b78a", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "52N Caramel", "hex": "#cda077", "undertone": "Neutral", "skintone": "Medium" }
+        ]
+      },
+      {
+        "product_name": "Coverlast Cushion",
+        "image": "https://storage.googleapis.com/6e927a7a-fad5-437f-bf8d-228eec029d0f/K36Gr3nICS1c8lDmXgZZA.jpg",
+        "description": "OMG Coverlast Cushion delivers high-performance coverage with superior skin attachment. Powered by Color Advanced Tech 2.0, the formula is non-oxidizing and long-lasting for up to 12 hours.",
+        "shades": [
+          { "shade_name": "13C Ivory", "hex": "#ecc3b2", "undertone": "Cool", "skintone": "Fair" },
+          { "shade_name": "21W Light", "hex": "#efdbb2", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "31W Beige", "hex": "#e0c09f", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "32N Natural", "hex": "#edc8a3", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "41W Sand", "hex": "#e7b78a", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "50N Creme", "hex": "#cda077", "undertone": "Neutral", "skintone": "Medium" }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Wardah",
+    "products": [
+      {
+        "product_name": "Colorfit 5D Blur Cloud Cushion",
+        "image": "https://d2jlkn4m127vak.cloudfront.net/medias/products/variant-1762750259.webp",
+        "description": "Wardah Colorfit 5D Blur Cloud Cushion is a high-performance foundation that delivers a sophisticated soft-matte finish. Formulated with innovative 5D Pore-Blurring Powder and infused with nano-Hyaluron + CICA.",
+        "shades": [
+          { "shade_name": "21C Shell", "hex": "#ffcbb4", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "21W Linen", "hex": "#ffd5ac", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "22N Light Ivory", "hex": "#fdcc9f", "undertone": "Neutral", "skintone": "Light" },
+          { "shade_name": "23W Warm Ivory", "hex": "#ffcd99", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "31W Creme Beige", "hex": "#fbc38f", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "32N Neutral Beige", "hex": "#ffbd91", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "33W Olive Beige", "hex": "#f5bc7d", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "42N Neutral Sand", "hex": "#ea9b6f", "undertone": "Neutral", "skintone": "Medium" }
+        ]
+      },
+      {
+        "product_name": "Colorfit Perfect Glow Cushion",
+        "image": "https://d2jlkn4m127vak.cloudfront.net/medias/products/variant-1762748213.webp",
+        "description": "High-performance cushion providing a radiant glow finish while keeping the skin hydrated and comfortable for up to 18 hours.",
+        "shades": [
+          { "shade_name": "11C Pink Fair", "hex": "#fbdec5", "undertone": "Cool", "skintone": "Fair" },
+          { "shade_name": "21C Shell", "hex": "#ffcbb4", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "21W Linen", "hex": "#ffd5ac", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "22N Light Ivory", "hex": "#fdcc9f", "undertone": "Neutral", "skintone": "Light" },
+          { "shade_name": "23W Warm Ivory", "hex": "#ffcd99", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "31C Parfait", "hex": "#ffb89c", "undertone": "Cool", "skintone": "Light Medium" },
+          { "shade_name": "31W Creme Beige", "hex": "#fbc38f", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "32N Neutral Beige", "hex": "#ffbd91", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "33W Olive Beige", "hex": "#f5bc7d", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "34W Honey", "hex": "#f3b799", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "41W Olive Sand", "hex": "#fcb47b", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "42N Neutral Sand", "hex": "#ea9b6f", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "43W Golden", "hex": "#e48358", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "52N Almond", "hex": "#e88d62", "undertone": "Neutral", "skintone": "Medium Deep" }
+        ]
+      },
+      {
+        "product_name": "Lightening Liquid Foundation 6ml",
+        "image": "https://d2jlkn4m127vak.cloudfront.net/medias/products/variant-1644227011.png",
+        "description": "Liquid foundation yang terasa ringan dan nyaman digunakan sehari-hari. Memilki coverage medium, mencerahkan, dan tahan lama hingga 12 jam.",
+        "shades": [
+          { "shade_name": "Light Beige", "hex": "#e6dfd9", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Beige", "hex": "#f7e5cc", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "Ivory", "hex": "#eed2ad", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "Natural", "hex": "#e89d69", "undertone": "Warm", "skintone": "Medium" }
+        ]
+      },
+      {
+        "product_name": "Colorfit HD Blurify Loose Powder",
+        "image": "https://image.astronauts.cloud/product-images/2026/1/27469_152afe3c-e3e9-4a4e-8efa-0e0655e9536d_900x900.jpg",
+        "description": "Bedak tabur ringan dengan Long Lasting Oil Control untuk hasil akhir matte yang menyamarkan pori-pori dan memperhalus tekstur kulit (efek HD). Tahan lama hingga 16 jam.",
+        "shades": [
+          { "shade_name": "00 Translucent", "hex": "#f3e3d2", "undertone": "Neutral", "skintone": "Light" },
+          { "shade_name": "22N Light Ivory", "hex": "#fdcc9f", "undertone": "Neutral", "skintone": "Light" },
+          { "shade_name": "23W Warm Ivory", "hex": "#ffcd99", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "32N Neutral Beige", "hex": "#ffbd91", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "43W Golden Sand", "hex": "#e48358", "undertone": "Warm", "skintone": "Medium" }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "ESQA",
+    "products": [
+      {
+        "product_name": "Minimalist Blurring Serum Skin Tint SPF 35 PA++",
+        "image": "https://esqacosmetics.com/cdn/shop/files/SKINTINT_-_CUSTARD_1200x.jpg?v=1729660025",
+        "description": "Serum-Powered Blurring Skin Tint with medium-buildable coverage that delivers natural velvet finish and 24-Hour longlasting wear. Powered by Blurring MetagramTM Technology.",
+        "shades": [
+          { "shade_name": "Milkshake", "hex": "#f2ecde", "undertone": "Neutral", "skintone": "Light" },
+          { "shade_name": "Vanilla", "hex": "#f4e6d0", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Custard", "hex": "#f3d19d", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "Granola", "hex": "#e0b997", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "Caramel", "hex": "#e9bd7a", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Biscuit", "hex": "#d6ad91", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Pancake", "hex": "#ebbe88", "undertone": "Warm", "skintone": "Medium Tan" },
+          { "shade_name": "Truffle", "hex": "#c79165", "undertone": "Neutral", "skintone": "Tan" },
+          { "shade_name": "Toffee", "hex": "#e1ab6b", "undertone": "Warm", "skintone": "Tan" },
+          { "shade_name": "Latte", "hex": "#a05937", "undertone": "Neutral", "skintone": "Deep Tan" }
+        ]
+      },
+      {
+        "product_name": "Flawless Cushion Serum SPF 50+ PA+++ - Satin",
+        "image": "https://esqacosmetics.com/cdn/shop/files/SATIN_CUSHION_-_CUSTARD_1200x.jpg?v=1729660086",
+        "description": "A 3-in-1 cushion that gives full coverage foundation, infused with 6X premium serum actives to calm, soothe, and brighten skin while providing SPF 50+ PA+++ protection.",
+        "shades": [
+          { "shade_name": "Milkshake", "hex": "#f2ecde", "undertone": "Neutral", "skintone": "Light" },
+          { "shade_name": "Vanilla", "hex": "#f4e6d0", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Custard", "hex": "#f3d19d", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "Granola", "hex": "#e0b997", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "Caramel", "hex": "#e9bd7a", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Biscuit", "hex": "#d6ad91", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Pancake", "hex": "#ebbe88", "undertone": "Warm", "skintone": "Medium Tan" },
+          { "shade_name": "Truffle", "hex": "#c79165", "undertone": "Neutral", "skintone": "Tan" }
+        ]
+      },
+      {
+        "product_name": "Minimalist Serum Concealer",
+        "image": "https://esqacosmetics.com/cdn/shop/files/biscuit_1200x.jpg?v=1718965672",
+        "description": "A hybrid serum-concealer that provides weightless, buildable coverage while improving skin health with multi-active ingredients. Dermatologically tested and safe for all skin types.",
+        "shades": [
+          { "shade_name": "Milkshake", "hex": "#f2ecde", "undertone": "Neutral", "skintone": "Light" },
+          { "shade_name": "Vanilla", "hex": "#f4e6d0", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Custard", "hex": "#f3d19d", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "Granola", "hex": "#e0b997", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "Caramel", "hex": "#e9bd7a", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Biscuit", "hex": "#d6ad91", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Pancake", "hex": "#ebbe88", "undertone": "Warm", "skintone": "Medium Tan" },
+          { "shade_name": "Truffle", "hex": "#c79165", "undertone": "Neutral", "skintone": "Tan" },
+          { "shade_name": "Toffee", "hex": "#e1ab6b", "undertone": "Warm", "skintone": "Tan" },
+          { "shade_name": "Latte", "hex": "#a05937", "undertone": "Neutral", "skintone": "Deep Tan" }
+        ]
+      },
+      {
+        "product_name": "Flawless Liquid Concealer",
+        "image": "https://esqacosmetics.com/cdn/shop/products/custard_3eda7abe-a648-459e-a1e4-1aac5c3dfe1b_1200x.jpg?v=1636354046",
+        "description": "Long-wearing, full coverage, and crease-proof formula that blurs skin imperfections and brightens the under-eye area without flaking.",
+        "shades": [
+          { "shade_name": "Milkshake", "hex": "#f2ecde", "undertone": "Neutral", "skintone": "Light" },
+          { "shade_name": "Vanilla", "hex": "#f4e6d0", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Custard", "hex": "#f3d19d", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "Granola", "hex": "#e0b997", "undertone": "Neutral", "skintone": "Light Medium" },
+          { "shade_name": "Caramel", "hex": "#e9bd7a", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Biscuit", "hex": "#d6ad91", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Pancake", "hex": "#ebbe88", "undertone": "Warm", "skintone": "Medium Tan" },
+          { "shade_name": "Truffle", "hex": "#c79165", "undertone": "Neutral", "skintone": "Tan" },
+          { "shade_name": "Toffee", "hex": "#e1ab6b", "undertone": "Warm", "skintone": "Tan" },
+          { "shade_name": "Latte", "hex": "#a05937", "undertone": "Neutral", "skintone": "Deep Tan" }
+        ]
+      },
+      {
+        "product_name": "Flawless Powder Foundation",
+        "image": "https://esqacosmetics.com/cdn/shop/products/flawless_powder_foundation_custard_1200x.jpg?v=1636357107",
+        "description": "A long-wearing powder foundation with medium-to-full buildable coverage and a velvet matte finish that controls shine all day.",
+        "shades": [
+          { "shade_name": "Vanilla", "hex": "#f4e6d0", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Custard", "hex": "#f3d19d", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "Caramel", "hex": "#e9bd7a", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Latte", "hex": "#a05937", "undertone": "Neutral", "skintone": "Deep Tan" }
+        ]
+      },
+      {
+        "product_name": "Flawless Micro Setting Powder",
+        "image": "https://esqacosmetics.com/cdn/shop/products/CUSTARD_WITH_SWATCH_1200x.jpg?v=1636355709",
+        "description": "Micro-fine powder that instantly blurs pores and fine lines, sets makeup without looking cakey, and creates a natural radiant effect.",
+        "shades": [
+          { "shade_name": "Translucent", "hex": "#f3e3d2", "undertone": "Neutral", "skintone": "Light" },
+          { "shade_name": "Vanilla", "hex": "#f4e6d0", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Custard", "hex": "#f3d19d", "undertone": "Warm", "skintone": "Light Medium" },
+          { "shade_name": "Caramel", "hex": "#e9bd7a", "undertone": "Warm", "skintone": "Medium" }
+        ]
+      }
+    ]
+  }
+]
