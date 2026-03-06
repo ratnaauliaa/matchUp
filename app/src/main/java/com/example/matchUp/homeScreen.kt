@@ -1,5 +1,6 @@
 package com.example.matchUp
 
+
 import com.example.matchUp.ui.theme.MyCustomFontFamily
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -7,9 +8,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Widgets
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,42 +15,56 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.example.matchUp.fdmatch.MatchViewModel
+
 
 @Composable
 fun MainContent(
     userName: String,
     onProfileClick: () -> Unit,
+    viewModel: MatchViewModel, // Tambahkan ini
+    navController: NavHostController,
     onNotificationsClick: () -> Unit,
-    onStartMatchClick: () -> Unit
+    onStartMatchClick: () -> Unit,
+    onUndertoneClick: () -> Unit,
+    isLoggedIn: Boolean,
+    onInsightClick: () -> Unit,
 ) {
-    Scaffold(
-        bottomBar = { BottomNavigationBar() }
-    ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            HomeScreen(
-                userName = userName,
-                onProfileClick = onProfileClick,
-                onNotificationsClick = onNotificationsClick,
-                onStartMatchClick = onStartMatchClick
-            )
-        }
-    }
+    HomeScreen(
+        userName = userName,
+        onProfileClick = onProfileClick,
+        viewModel = viewModel, // Teruskan ke bawah
+        navController = navController,
+        onNotificationsClick = onNotificationsClick,
+        onStartMatchClick = onStartMatchClick,
+        onUndertoneClick = onUndertoneClick,
+        isLoggedIn = isLoggedIn,
+        onInsightClick = onInsightClick
+    )
 }
 
 @Composable
 fun HomeScreen(
     userName: String,
     onProfileClick: () -> Unit,
+    viewModel: MatchViewModel, // Tambahkan ini
+    navController: NavHostController,
     onNotificationsClick: () -> Unit,
-    onStartMatchClick: () -> Unit
+    onStartMatchClick: () -> Unit,
+    isLoggedIn: Boolean,
+    onUndertoneClick: () -> Unit,
+    onInsightClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -74,7 +86,7 @@ fun HomeScreen(
                     text = buildAnnotatedString {
                         append("Hello, ")
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Color.Black)) {
-                            append(userName) // Nama akan berubah sesuai yang didaftarkan
+                            append(userName)
                         }
                     },
                     fontSize = 24.sp,
@@ -83,7 +95,7 @@ fun HomeScreen(
                 )
                 Text(
                     text = "Let's discover your perfect shade!",
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     color = Color.Gray,
                     fontFamily = MyCustomFontFamily,
                 )
@@ -98,8 +110,8 @@ fun HomeScreen(
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.profile_pic),
+                AsyncImage(
+                    model = R.drawable.profile_pic,
                     contentDescription = "Profile",
                     modifier = Modifier
                         .size(40.dp)
@@ -116,25 +128,28 @@ fun HomeScreen(
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = Color(0xFFE8EAF6),
-            shape = RoundedCornerShape(16.dp),
-            onClick = { /* Aksi klik banner ke quiz undertone */ }
+            shape = RoundedCornerShape(20.dp), // Lebih melengkung (pill shape)
+            onClick = {
+                if (isLoggedIn) onUndertoneClick() else navController.navigate("login")
+            }
         ) {
             Row(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = "Don't know your Undertone? Find out now!",
-                    fontSize = 13.sp,
+                    fontSize = 15.sp,
                     fontFamily = MyCustomFontFamily,
                     fontWeight = FontWeight.Medium,
-                    color = Color.Black
+                    color = Color.Black,
+                    modifier = Modifier.weight(1f)
                 )
                 Icon(
                     imageVector = Icons.Default.ArrowForward,
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp),
+                    modifier = Modifier.size(22.dp),
                     tint = Color.Black
                 )
             }
@@ -149,7 +164,13 @@ fun HomeScreen(
                 imageRes = R.drawable.ic_fd,
                 containerColor = Color(0xFFFFD1E3),
                 modifier = Modifier.weight(1f),
-                onClick = onStartMatchClick // Ini akan navigasi ke Step 1
+                onClick = {
+                    if (viewModel.isLoggedIn) { // Pakai 'viewModel' yang dikirim dari parameter
+                        onStartMatchClick() // Panggil callback yang sudah ada
+                    } else {
+                        navController.navigate("login")
+                    }
+                }
             )
             Spacer(modifier = Modifier.width(16.dp))
             CategoryCard(
@@ -157,11 +178,17 @@ fun HomeScreen(
                 imageRes = R.drawable.ic_lips,
                 containerColor = Color(0xFFFFD1E3),
                 modifier = Modifier.weight(1f),
-                onClick = { /* Implementasi Lips Match */ }
+                onClick = {
+                    if (isLoggedIn) {
+                        onUndertoneClick()
+                    } else {
+                        navController.navigate("login")
+                    }
+                }
             )
         }
 
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         // --- RECOMMENDATION SECTION ---
         SectionHeader(title = "Recommendation", onShowAllClick = {})
@@ -176,10 +203,15 @@ fun HomeScreen(
             imageRes = R.drawable.prod_3ce
         )
 
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         // --- FOR YOU SECTION ---
-        SectionHeader(title = "For you", actionText = "View more", onShowAllClick = {})
+        SectionHeader(
+            title = "For you",
+            actionText = "View more",
+            onShowAllClick = onInsightClick
+        )
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -187,37 +219,83 @@ fun HomeScreen(
         ) {
             ArticleCard(
                 title = "10 Tips on How To Choose Your Perfect Foundation Shade",
-                imageRes = R.drawable.img_article1
+                imageRes = R.drawable.img_shade,
+                onClick = onInsightClick // Berhasil karena ArticleCard sudah diupdate
             )
             Spacer(modifier = Modifier.width(16.dp))
             ArticleCard(
                 title = "How To Identify Your Skin Undertone",
-                imageRes = R.drawable.img_article2
+                imageRes = R.drawable.img_undertone,
+                onClick = onInsightClick
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            ArticleCard(
+                title = "4 Tips To Make Your Makeup Look Smooth",
+                imageRes = R.drawable.img_skin,
+                onClick = onInsightClick
             )
         }
-        Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
 @Composable
-fun CategoryCard(title: String, imageRes: Int, containerColor: Color, modifier: Modifier, onClick: () -> Unit) {
-    Column(
+fun CategoryCard(
+    title: String,
+    imageRes: Int,
+    containerColor: Color,
+    modifier: Modifier,
+    onClick: () -> Unit
+) {
+    Box(
         modifier = modifier
-            .clip(RoundedCornerShape(24.dp))
+            .height(160.dp) // Tingginya ditambah agar tidak kepotong
+            .clip(RoundedCornerShape(32.dp))
             .background(containerColor)
             .clickable { onClick() }
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(id = imageRes),
-            contentDescription = title,
-            modifier = Modifier.size(100.dp)
-        )
-        Text(text = title, fontWeight = FontWeight.Bold, fontFamily = MyCustomFontFamily, fontSize = 16.sp, color = Color.Black)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom // Teks di bawah
+        ) {
+            AsyncImage(
+                model = imageRes,
+                contentDescription = title,
+                modifier = Modifier.size(100.dp), // Ukuran gambar ilustrasi
+                contentScale = ContentScale.Fit
+            )
+
+            Text(
+                text = title,
+                fontWeight = FontWeight.Normal,
+                fontFamily = MyCustomFontFamily,
+                fontSize = 15.sp, // Ukuran lebih besar seperti Figma
+                color = Color.Black
+            )
+        }
+
+        // TOMBOL PANAH DI SAMPING (Sesuai Figma)
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .offset(x = 12.dp) // Setengah lingkaran keluar
+                .size(45.dp)
+                .clip(CircleShape)
+                .background(Color.White),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp).padding(end = 5.dp),
+                tint = Color.Black
+            )
+        }
     }
 }
-
 @Composable
 fun RecommendationItem(brand: String, name: String, imageRes: Int) {
     Row(
@@ -244,20 +322,24 @@ fun RecommendationItem(brand: String, name: String, imageRes: Int) {
     }
 }
 
+
 @Composable
-fun ArticleCard(title: String, imageRes: Int) {
+fun ArticleCard(title: String, imageRes: Int, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .width(160.dp)
             .height(200.dp)
             .clip(RoundedCornerShape(16.dp))
-            .clickable { }
+            .clickable { onClick() }
     ) {
-        Image(
-            painter = painterResource(id = imageRes),
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageRes)
+                .crossfade(true) // Menambahkan efek fade-in halus
+                .build(),
             contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
         Box(
             modifier = Modifier
@@ -281,41 +363,6 @@ fun SectionHeader(title: String, actionText: String = "Show all", onShowAllClick
         Text(title, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.Black)
         TextButton(onClick = onShowAllClick) {
             Text(actionText, color = Color.Gray, fontSize = 12.sp)
-        }
-    }
-}
-
-@Composable
-fun BottomNavigationBar() {
-    NavigationBar(containerColor = Color.White) {
-        // List menu agar kode lebih rapi
-        val items = listOf("Home", "Insights", "Wishlist", "Profile")
-        val icons = listOf(Icons.Default.Home, Icons.Outlined.Widgets, Icons.Outlined.FavoriteBorder, Icons.Outlined.Person)
-
-        items.forEachIndexed { index, item ->
-            val isSelected = index == 0 // Contoh: Home yang terpilih
-
-            NavigationBarItem(
-                selected = isSelected,
-                onClick = { /* Navigasi ke screen terkait */ },
-                icon = {
-                    Icon(
-                        imageVector = if (isSelected) icons[index] else icons[index],
-                        contentDescription = item
-                    )
-                },
-                label = { Text(item) },
-                colors = NavigationBarItemDefaults.colors(
-                    // Warna saat terpilih
-                    selectedIconColor = Color.Black,
-                    selectedTextColor = Color.Black,
-                    indicatorColor = Color(0xFFFFD1E3), // Background lonjong pink
-
-                    // WARNA ABU GANTI HITAM DI SINI:
-                    unselectedIconColor = Color.Black,
-                    unselectedTextColor = Color.Black
-                )
-            )
         }
     }
 }

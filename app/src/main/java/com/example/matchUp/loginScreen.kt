@@ -25,7 +25,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit,
+    onLoginSuccess: (String) -> Unit,
     onForgotPassword: () -> Unit,
     onRegisterClick: () -> Unit,
     onBack: () -> Unit = {},
@@ -73,7 +73,7 @@ fun LoginScreen(
         )
         Text(
             text = "Good to see you again! Please enter your details.",
-            fontSize = 14.sp,
+            fontSize = 15.sp,
             color = Color.Gray,
             fontFamily = MyCustomFontFamily
         )
@@ -147,7 +147,7 @@ fun LoginScreen(
                     pass = password,
                     onSuccess = {
                         isLoading = false
-                        onLoginSuccess()
+                        onLoginSuccess(email)
                     },
                     onError = { firebaseError ->
                         isLoading = false
@@ -172,7 +172,7 @@ fun LoginScreen(
                 .align(Alignment.CenterHorizontally),
             enabled = !isLoading,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD1E3)),
-            shape = RoundedCornerShape(22.dp)
+            shape = RoundedCornerShape(20.dp)
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
@@ -185,12 +185,24 @@ fun LoginScreen(
                     text = "Sign In",
                     color = Color.Black,
                     fontWeight = FontWeight.Bold,
-                    fontFamily = MyCustomFontFamily
+                    fontFamily = MyCustomFontFamily,
+                    fontSize = 15.sp
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(60.dp))
+
+        Spacer(modifier = Modifier.height(20.dp))
+        Text(text = "Or continue with", fontFamily = MyCustomFontFamily, modifier = Modifier.align(Alignment.CenterHorizontally), fontSize = 12.sp, color = Color.Gray)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            SocialCircleButton(imageResId = R.drawable.google)
+            Spacer(modifier = Modifier.width(16.dp))
+            SocialCircleButton(imageResId = R.drawable.fb)
+        }
+
+        Spacer(modifier = Modifier.height(30.dp))
 
         Row(
             modifier = Modifier

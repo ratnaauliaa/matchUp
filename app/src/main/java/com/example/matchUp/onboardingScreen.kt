@@ -37,64 +37,76 @@ fun OnboardingScreen(onFinished: () -> Unit) {
             .padding(horizontal = 20.dp)
     ) {
         // --- Bagian Atas: Tombol Skip ---
-        Box(modifier = Modifier.fillMaxWidth().height(60.dp)) {
+        // --- Bagian Atas: Skip Button ---
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp) // Box ini tetap ada di halaman 3 meski kosong
+                .padding(horizontal = 20.dp),
+            contentAlignment = Alignment.CenterEnd
+        ) {
+            // Tombol skip hanya muncul di halaman 1 & 2
             if (pagerState.currentPage < onboardingPages.size - 1) {
                 TextButton(
                     onClick = {
                         scope.launch { pagerState.animateScrollToPage(onboardingPages.size - 1) }
-                    },
-                    modifier = Modifier.align(Alignment.CenterEnd)
+                    }
                 ) {
                     Text(
                         text = "Skip",
                         color = Color.Gray,
                         fontFamily = MyCustomFontFamily,
-                        fontWeight = FontWeight.Light, // Memakai light_font.ttf
-                        fontSize = 14.sp
+                        fontWeight = FontWeight.Light,
+                        fontSize = 15.sp
                     )
                 }
             }
         }
 
-        // --- Bagian Tengah: Pager ---
+// --- Bagian Tengah: Pager ---
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.weight(1f),
-            verticalAlignment = Alignment.CenterVertically // Pastikan konten di tengah secara vertikal
+            // PENTING: Ubah CenterVertically menjadi Top agar semua halaman
+            // mulai menggambar konten dari titik atas yang sama
+            verticalAlignment = Alignment.Top
         ) { pageIndex ->
             val page = onboardingPages[pageIndex]
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp),
+                    .padding(horizontal = 10.dp)
+                    // Tambahkan padding top yang fix agar gambar punya jarak dari area Skip
+                    .padding(top = 70.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
                     painter = painterResource(id = page.imageRes),
                     contentDescription = null,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(280.dp), // Sedikit dikecilkan agar proporsional
+                        .size(300.dp) // Pastikan ukuran gambar konsisten di semua halaman
+                        .padding(bottom = 20.dp),
                     contentScale = ContentScale.Fit
                 )
-                Spacer(modifier = Modifier.height(32.dp)) // Jarak antar gambar ke judul diperbesar
+
                 Text(
                     text = page.title,
-                    fontSize = 26.sp, // Judul sedikit lebih besar
-                    fontWeight = FontWeight.Bold,
                     fontFamily = MyCustomFontFamily,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 32.sp // Jarak antar baris biar enak dibaca
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
+                    textAlign = TextAlign.Center
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Text(
                     text = page.description,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Normal, // Pakai Normal untuk deskripsi biar mata gak capek
-                    color = Color.Gray,
                     fontFamily = MyCustomFontFamily,
+                    fontSize = 15.sp,
+                    color = Color.Gray,
                     textAlign = TextAlign.Center,
-                    lineHeight = 22.sp
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
             }
         }
@@ -131,18 +143,18 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                 }
             },
             modifier = Modifier
-                .fillMaxWidth() // Buat tombol lebih lebar biar gampang diklik (UX)
-                .padding(horizontal = 20.dp)
-                .height(54.dp),
+                .width(200.dp)
+                .height(45.dp)
+                .align(Alignment.CenterHorizontally),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD1E3)),
-            shape = RoundedCornerShape(16.dp) // Rounded yang tidak terlalu tajam
+            shape = RoundedCornerShape(20.dp) // Rounded yang tidak terlalu tajam
         ) {
             Text(
                 text = onboardingPages[pagerState.currentPage].buttonText,
                 color = Color.Black,
                 fontFamily = MyCustomFontFamily,
                 fontWeight = FontWeight.Bold, // Tombol pakai Bold agar tegas
-                fontSize = 16.sp
+                fontSize = 15.sp
             )
         }
         Spacer(modifier = Modifier.height(50.dp)) // Jarak aman ke bawah layar

@@ -9,142 +9,232 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.math.pow
 import kotlin.math.sqrt
+import com.example.matchUp.UndertoneResult
 
-// 1. Model untuk JSON list brand (brands_list.json)
+// =====================================================================
+// 1. MODEL DATA
+// =====================================================================
+
 data class BrandInfo(
     val name: String,
     val status: String
 )
 
-// 2. Model untuk JSON data produk lengkap (products_data.json)
-data class BrandDetail(
-    val brand: String,
-    val products: List<Product> = emptyList()
-)
-
-// 3. Model untuk menampung rincian yang dipilih user
 data class SelectedMatchData(
     val brandName: String,
     val product: Product,
     val shade: Shade
 )
 
+data class HistoryData(
+    val date: String,
+    val details: List<String>
+)
+
+data class Article(
+    val id: Int,
+    val title: String,
+    val category: String,
+    val description: String,
+    val imageUrl: String,
+    val content: String,
+    val sourceUrl: String
+)
+
+data class UndertoneDataWrapper(
+    val undertone_results: List<UndertoneResult>
+)
+
+// Pindahkan ke sini agar global
+data class Rgb(val r: Int, val g: Int, val b: Int)
+
+// =====================================================================
+// 2. VIEWMODEL
+// =====================================================================
+
 class MatchViewModel : ViewModel() {
 
-    // State untuk Nama User
-    var userName by mutableStateOf("User")
+    // --- USER PROFILE STATE ---
 
-    // State untuk Data Brand dan Produk
+    var isLoggedIn by mutableStateOf(false)
+    var userName by mutableStateOf("Guest")
+    var userEmail by mutableStateOf("")
+
+    // --- DATA STATE ---
     var allBrandList by mutableStateOf<List<BrandInfo>>(listOf())
     var productsData by mutableStateOf<List<BrandDetail>>(listOf())
 
-    // State untuk Seleksi saat ini
+    // --- SELECTION STATE ---
     var selectedBrandName by mutableStateOf("")
     var selectedProduct by mutableStateOf<Product?>(null)
     var selectedShade by mutableStateOf<Shade?>(null)
 
-    // List ringkasan untuk menampung beberapa pilihan (yang muncul di pop-up)
     var selectedMatches = mutableStateListOf<SelectedMatchData>()
+    var historyList = mutableStateListOf<HistoryData>()
+    private var lastSavedMatches: List<SelectedMatchData> = listOf()
 
-    // Fungsi untuk update nama user
-    fun updateUserName(newName: String) {
-        if (newName.isNotEmpty()) {
-            userName = newName
+    // --- WISHLIST & INSIGHT STATE ---
+    var searchQuery by mutableStateOf("")
+    var selectedInsightCategory by mutableStateOf("All")
+    var allArticles by mutableStateOf<List<Article>>(listOf())
+    var savedProducts = mutableStateListOf<Product>()
+
+    // --- TEST UNDERTONE STATE ---
+    var warmScore by mutableStateOf(0)
+    var coolScore by mutableStateOf(0)
+    var neutralScore by mutableStateOf(0)
+    var finalUndertone by mutableStateOf("")
+
+    // 1. Wishlist Logic
+    fun toggleSaveProduct(product: Product) {
+        val existing = savedProducts.find { it.product_name == product.product_name }
+        if (existing != null) {
+            savedProducts.remove(existing)
+        } else {
+            savedProducts.add(0, product)
         }
     }
 
-    // PERBAIKAN: Fungsi untuk menambah kecocokan (Match)
+    fun isProductSaved(productName: String): Boolean {
+        return savedProducts.any { it.product_name == productName }
+    }
+
+    // 2. Article Logic
+    fun getFilteredArticles(): List<Article> {
+        val filteredByCategory = if (selectedInsightCategory == "All") {
+            allArticles
+        } else {
+            allArticles.filter { it.category.equals(selectedInsightCategory, ignoreCase = true) }
+        }
+
+        return if (searchQuery.isEmpty()) {
+            filteredByCategory
+        } else {
+            filteredByCategory.filter {
+                it.title.contains(searchQuery, ignoreCase = true) ||
+                        it.description.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
+
+    // 3. Undertone Logic
+    fun resetScores() {
+        warmScore = 0
+        coolScore = 0
+        neutralScore = 0
+    }
+
+    fun getResult(): String {
+        return when {
+            warmScore > coolScore && warmScore > neutralScore -> "Warm"
+            coolScore > warmScore && coolScore > neutralScore -> "Cool"
+            else -> "Neutral"
+        }
+    }
+
+    fun setUserProfile(name: String, email: String) {
+        userName = name
+        userEmail = email
+    }
+
+    fun updateUserName(newName: String) {
+        if (newName.isNotEmpty()) userName = newName
+    }
+
+    // 4. Match & History Logic
     fun addMatch(brandName: String, product: Product, shade: Shade) {
-        // Cek agar tidak ada duplikat shade yang sama dari produk yang sama
         val isAlreadyAdded = selectedMatches.any {
             it.shade.shade_name == shade.shade_name && it.product.product_name == product.product_name
         }
-
         if (!isAlreadyAdded) {
-            // Gunakan SelectedMatchData (sesuai nama data class di atas)
             selectedMatches.add(SelectedMatchData(brandName, product, shade))
         }
     }
 
-    // Fungsi untuk menghapus kecocokan dari list
     fun removeMatch(index: Int) {
-        if (index in selectedMatches.indices) {
-            selectedMatches.removeAt(index)
-        }
+        if (index in selectedMatches.indices) selectedMatches.removeAt(index)
     }
 
-    // Fungsi memuat file JSON dari Assets
-    fun loadData(context: Context) {
-        val gson = Gson()
-
-        // Muat list brand aktif/tidak aktif
-        try {
-            val brandsJson = context.assets.open("brands_list.json").bufferedReader().use { it.readText() }
-            val brandListType = object : TypeToken<List<BrandInfo>>() {}.type
-            allBrandList = gson.fromJson(brandsJson, brandListType)
-            Log.d("MatchVM", "✅ Brand List Loaded: ${allBrandList.size} items")
-        } catch (e: Exception) {
-            Log.e("MatchVM", "❌ Error loading brands_list: ${e.message}")
-        }
-
-        // Muat detail produk, brand, dan shade
-        try {
-            val productsJson = context.assets.open("products_data.json").bufferedReader().use { it.readText() }
-            val productsType = object : TypeToken<List<BrandDetail>>() {}.type
-            productsData = gson.fromJson(productsJson, productsType)
-            Log.d("MatchVM", "✅ Product Data Loaded: ${productsData.size} brands")
-        } catch (e: Exception) {
-            Log.e("MatchVM", "❌ Error loading products_data: ${e.message}")
-        }
+    fun clearCurrentSelection() {
+        selectedBrandName = ""
+        selectedProduct = null
+        selectedShade = null
     }
 
-    // Fungsi pencarian produk berdasarkan nama brand
-    fun getProductsByBrand(brandName: String): List<Product> {
-        if (productsData.isEmpty()) return emptyList()
-
-        val foundBrand = productsData.find {
-            it.brand.trim().equals(brandName.trim(), ignoreCase = true)
-        }
-        return foundBrand?.products ?: emptyList()
-    }
-
-    // Di dalam MatchViewModel.kt
     fun resetSelection() {
         selectedProduct = null
         selectedShade = null
-        // selectedBrandName = "" // Jika perlu
     }
 
-    /**
-     * Algoritma Pencocokan Warna (Euclidean Distance)
-     * Digunakan nanti di Result Screen untuk mencari shade paling mirip
-     */
+    fun saveMatchToHistory() {
+        if (selectedMatches.isNotEmpty() && selectedMatches.toList() != lastSavedMatches) {
+            val sdf = SimpleDateFormat("EEEE, d MMMM yyyy", Locale.getDefault())
+            val currentDate = sdf.format(Date())
+            val fullDetails = selectedMatches.map {
+                "${it.brandName} ${it.product.product_name} - ${it.shade.shade_name}"
+            }
+            historyList.add(0, HistoryData(currentDate, fullDetails))
+            lastSavedMatches = selectedMatches.toList()
+        }
+    }
+
+    fun clearAllHistory() {
+        historyList.clear()
+        lastSavedMatches = listOf()
+    }
+
+    // 5. Data Loading
+    fun loadData(context: Context) {
+        val gson = Gson()
+        try {
+            val brandsJson = context.assets.open("brands_list.json").bufferedReader().use { it.readText() }
+            allBrandList = gson.fromJson(brandsJson, object : TypeToken<List<BrandInfo>>() {}.type)
+
+            val productsJson = context.assets.open("products_data.json").bufferedReader().use { it.readText() }
+            productsData = gson.fromJson(productsJson, object : TypeToken<List<BrandDetail>>() {}.type)
+
+            val articlesJson = context.assets.open("articles_data.json").bufferedReader().use { it.readText() }
+            allArticles = gson.fromJson(articlesJson, object : TypeToken<List<Article>>() {}.type)
+
+            Log.d("MatchVM", "✅ All Data Loaded Successfully")
+        } catch (e: Exception) {
+            Log.e("MatchVM", "❌ Error loading data: ${e.message}")
+        }
+    }
+
+    fun loadUndertoneResultsFromJson(context: Context): List<UndertoneResult> {
+        return try {
+            val jsonString = context.assets.open("undertone_data.json").bufferedReader().use { it.readText() }
+            val dataWrapper: UndertoneDataWrapper = Gson().fromJson(jsonString, object : TypeToken<UndertoneDataWrapper>() {}.type)
+            Log.d("MatchVM", "✅ Undertone Data Loaded Successfully")
+            dataWrapper.undertone_results
+        } catch (e: Exception) {
+            Log.e("MatchVM", "❌ Error: ${e.message}")
+            emptyList()
+        }
+    }
+
+    fun getProductsByBrand(brandName: String): List<Product> {
+        val foundBrand = productsData.find { it.brand.trim().equals(brandName.trim(), ignoreCase = true) }
+        return foundBrand?.products ?: emptyList()
+    }
+
     fun calculateColorDistance(hex1: String, hex2: String): Double {
         return try {
-            val h1 = hex1.replace("#", "").let {
-                if (it.length == 3) it.map { c -> "$c$c" }.joinToString("") else it
-            }
-            val h2 = hex2.replace("#", "").let {
-                if (it.length == 3) it.map { c -> "$c$c" }.joinToString("") else it
-            }
-
-            val r1 = h1.substring(0, 2).toInt(16)
-            val g1 = h1.substring(2, 4).toInt(16)
-            val b1 = h1.substring(4, 6).toInt(16)
-
-            val r2 = h2.substring(0, 2).toInt(16)
-            val g2 = h2.substring(2, 4).toInt(16)
-            val b2 = h2.substring(4, 6).toInt(16)
-
-            sqrt(
-                (r2 - r1).toDouble().pow(2) +
-                        (g2 - g1).toDouble().pow(2) +
-                        (b2 - b1).toDouble().pow(2)
-            )
+            val h1 = hexToRgb(hex1)
+            val h2 = hexToRgb(hex2)
+            sqrt((h2.r - h1.r).toDouble().pow(2) + (h2.g - h1.g).toDouble().pow(2) + (h2.b - h1.b).toDouble().pow(2))
         } catch (e: Exception) {
             Double.MAX_VALUE
         }
+    }
+
+    private fun hexToRgb(hex: String): Rgb {
+        val h = hex.replace("#", "").let { if (it.length == 3) it.map { c -> "$c$c" }.joinToString("") else it }
+        return Rgb(h.substring(0, 2).toInt(16), h.substring(2, 4).toInt(16), h.substring(4, 6).toInt(16))
     }
 }

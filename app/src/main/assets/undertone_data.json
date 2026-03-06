@@ -1,0 +1,46 @@
+{
+  "undertone_results": [
+    {
+      "undertone_id": "warm",
+      "result_title": "You have warm undertones!",
+      "description": "Your skin has yellow, golden, or peach tones that glow best with warm-based shades.",
+      "recommendations": {
+        "foundations": "Foundations with golden, yellow, or peach bases",
+        "concealers": "Concealers 1-2 shades lighter with warm undertones to maintain a natural brightness",
+        "lipsticks": "Blushes & Lipsticks in terracotta, coral, apricot, warm nude, or brick red"
+      },
+      "avoid": [
+        "Shades labeled cool pink or rosy beige",
+        "Ashy contours (opt for warm caramel or bronze instead)"
+      ]
+    },
+    {
+      "undertone_id": "cool",
+      "result_title": "You have cool undertones!",
+      "description": "Your skin has pink, red, or bluish tones that harmonize best with cooler shades.",
+      "recommendations": {
+        "foundations": "Foundations with pink, red, or neutral-cool bases",
+        "concealers": "Concealers 1-2 shades lighter with cool undertones to brighten without turning orange",
+        "lipsticks": "Blushes & Lipsticks in berry, plum, rosy pink, or cool mauve"
+      },
+      "avoid": [
+        "Shades labeled golden, yellow, or warm beige",
+        "Orange-based blush or brick-red lipsticks"
+      ]
+    },
+    {
+      "undertone_id": "neutral",
+      "result_title": "You have neutral undertones!",
+      "description": "Your skin has a balanced mix of warm and cool tones, making it versatile for many shade families.",
+      "recommendations": {
+        "foundations": "Foundations labeled neutral or balanced (not overly yellow or pink)",
+        "concealers": "Concealers close to your exact undertone—avoid extremes of too pink or too yellow",
+        "lipsticks": "Blushes & Lipsticks in soft rose, dusty mauve, balanced nude, or muted coral"
+      },
+      "avoid": [
+        "Extremely yellow/golden foundations",
+        "Overly pink or blue-based shades that overpower your natural balance"
+      ]
+    }
+  ]
+}

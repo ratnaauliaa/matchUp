@@ -24,6 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.matchUp.CustomSmallTextField
+import com.example.matchUp.R
+import com.example.matchUp.SocialCircleButton
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
@@ -34,15 +36,13 @@ fun ForgotPW(
     onSignInClick: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
-    // Ubah inisialisasi agar lebih konsisten dengan pengecekan
     var errorMessage by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    // PERBAIKAN LOGIKA: Timer untuk menghilangkan error
     if (errorMessage.isNotEmpty()) {
         LaunchedEffect(errorMessage) {
-            delay(3000) // 3 detik
+            delay(3000)
             errorMessage = ""
         }
     }
@@ -57,7 +57,7 @@ fun ForgotPW(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(bottom = 100.dp)
+                .padding(bottom = 30.dp)
         ) {
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -68,13 +68,14 @@ fun ForgotPW(
                     .size(40.dp)
                     .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(10.dp))
             ) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
             }
 
             Spacer(modifier = Modifier.height(30.dp))
 
             Text(
                 text = "Forgot Password",
+                color = Color.Black,
                 fontSize = 24.sp,
                 fontFamily = MyCustomFontFamily,
                 fontWeight = FontWeight.Bold
@@ -82,7 +83,7 @@ fun ForgotPW(
 
             Text(
                 text = "Enter your email to receive a reset link.",
-                fontSize = 14.sp,
+                fontSize = 15.sp,
                 color = Color.Gray,
                 fontFamily = MyCustomFontFamily,
                 modifier = Modifier.padding(top = 4.dp)
@@ -96,12 +97,12 @@ fun ForgotPW(
                 value = email,
                 onValueChange = {
                     email = it
-                    // Langsung hapus error saat user mengetik ulang
                     if (errorMessage.isNotEmpty()) errorMessage = ""
                 },
                 placeholder = "example@gmail.com",
                 keyboardType = KeyboardType.Email
             )
+            Spacer(modifier = Modifier.height(20.dp))
 
             // Error Message Box
             Box(
@@ -122,7 +123,7 @@ fun ForgotPW(
                 }
             }
 
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
             // Send Link Button
             Button(
@@ -130,34 +131,18 @@ fun ForgotPW(
                     val cleanEmail = email.trim()
                     if (cleanEmail.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(cleanEmail).matches()) {
                         isLoading = true
-                        // ... di dalam onClick Button ...
                         FirebaseAuth.getInstance().sendPasswordResetEmail(cleanEmail)
                             .addOnCompleteListener { task ->
                                 isLoading = false
                                 if (task.isSuccessful) {
-                                    Toast.makeText(
-                                        context,
-                                        "Reset link sent! Check your inbox.",
-                                        Toast.LENGTH_LONG
-                                    ).show()
+                                    Toast.makeText(context, "Reset link sent! Check your inbox.", Toast.LENGTH_LONG).show()
                                     onNext(cleanEmail)
                                 } else {
-                                    // AMBIL PESAN ERROR ASLI DARI FIREBASE
-                                    val exception = task.exception
-                                    val errorMsg = exception?.message ?: ""
-
+                                    val errorMsg = task.exception?.message ?: ""
                                     errorMessage = when {
-                                        // Firebase Error Code: ERROR_USER_NOT_FOUND
                                         errorMsg.contains("no user", ignoreCase = true) ||
-                                                errorMsg.contains("user-not-found") ||
-                                                errorMsg.contains("not registered") -> "This email is not registered."
-
-                                        errorMsg.contains("network", ignoreCase = true) -> "Network error. Check connection."
-
-                                        // Jika error karena format email (meski sudah divalidasi manual)
-                                        errorMsg.contains("badly formatted", ignoreCase = true) -> "Invalid email address."
-
-                                        else -> "Failed: User not found or system busy."
+                                                errorMsg.contains("user-not-found") -> "This email is not registered."
+                                        else -> "Failed: System busy."
                                     }
                                 }
                             }
@@ -173,42 +158,46 @@ fun ForgotPW(
                     .align(Alignment.CenterHorizontally),
                 enabled = !isLoading,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD1E3)),
-                shape = RoundedCornerShape(22.dp)
+                shape = RoundedCornerShape(20.dp)
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        color = Color.Black,
-                        strokeWidth = 2.dp
-                    )
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.Black, strokeWidth = 2.dp)
                 } else {
-                    Text(
-                        text = "Send link",
-                        color = Color.Black,
-                        fontFamily = MyCustomFontFamily,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text("Send link", color = Color.Black,fontSize = 15.sp, fontFamily = MyCustomFontFamily, fontWeight = FontWeight.Bold)
                 }
             }
-        }
 
-        // Footer (Tetap di bawah)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 50.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(text = "Already have an account? ", fontFamily = MyCustomFontFamily, fontSize = 13.sp, color = Color.Gray)
-            Text(
-                text = "Sign In",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = MyCustomFontFamily,
-                color = Color.Black,
-                modifier = Modifier.clickable { onSignInClick() }
-            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(text = "Or continue with", fontFamily = MyCustomFontFamily, modifier = Modifier.align(Alignment.CenterHorizontally), fontSize = 12.sp, color = Color.Gray)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                SocialCircleButton(imageResId = com.example.matchUp.R.drawable.google)
+                Spacer(modifier = Modifier.width(16.dp))
+                SocialCircleButton(imageResId = R.drawable.fb)
+            }
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Already have an account? ",
+                    fontFamily = MyCustomFontFamily,
+                    fontSize = 13.sp,
+                    color = Color.Gray
+                )
+                Text(
+                    text = "Sign In",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = MyCustomFontFamily,
+                    color = Color.Black,
+                    modifier = Modifier.clickable { onSignInClick() }
+                )
+            }
         }
     }
 }

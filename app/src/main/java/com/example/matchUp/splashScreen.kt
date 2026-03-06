@@ -15,11 +15,9 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(onTimeout: () -> Unit) {
-
-    // --- TAMBAHKAN LOGIKA DURASI DI SINI ---
     LaunchedEffect(key1 = true) {
-        delay(3000) // Durasi 3000 milidetik = 3 detik
-        onTimeout() // Panggil fungsi untuk pindah halaman
+        delay(3000) //durasi
+        onTimeout()
     }
 
     Box(
@@ -31,12 +29,11 @@ fun SplashScreen(onTimeout: () -> Unit) {
         Image(
             painter = painterResource(id = R.drawable.ic_logo_matchup),
             contentDescription = "MatchUp Logo",
-            modifier = Modifier.fillMaxSize(0.6f)
+            modifier = Modifier.fillMaxSize(0.4f)
         )
     }
 }
 
-// Untuk Preview, kita beri lambda kosong saja
 @Preview(showBackground = true)
 @Composable
 fun PreviewSplash() {

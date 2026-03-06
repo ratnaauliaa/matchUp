@@ -80,21 +80,21 @@ fun RegisterScreen(
                 .size(40.dp)
                 .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(10.dp))
         ) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
         }
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        Text(text = "Create account", fontFamily = MyCustomFontFamily, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Text(text = "Create account", fontFamily = MyCustomFontFamily, fontSize = 24.sp,color = Color.Black, fontWeight = FontWeight.Bold)
         Text(
             text = "Please enter your valid data to create an account.",
-            fontSize = 14.sp,
+            fontSize = 15.sp,
             fontFamily = MyCustomFontFamily,
             color = Color.Gray,
             modifier = Modifier.padding(top = 4.dp)
         )
 
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
         // --- INPUT FIELDS ---
         CustomSmallTextField(
@@ -210,12 +210,12 @@ fun RegisterScreen(
                 .align(Alignment.CenterHorizontally),
             enabled = !isLoading,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD1E3)),
-            shape = RoundedCornerShape(21.dp)
+            shape = RoundedCornerShape(20.dp)
         ) {
             if (isLoading) {
                 CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.Black, strokeWidth = 2.dp)
             } else {
-                Text(text = "Sign Up", color = Color.Black, fontFamily = MyCustomFontFamily, fontWeight = FontWeight.Bold)
+                Text(text = "Sign Up", color = Color.Black, fontSize = 15.sp, fontFamily = MyCustomFontFamily, fontWeight = FontWeight.Bold)
             }
         }
 
@@ -227,8 +227,6 @@ fun RegisterScreen(
             SocialCircleButton(imageResId = R.drawable.google)
             Spacer(modifier = Modifier.width(16.dp))
             SocialCircleButton(imageResId = R.drawable.fb)
-            Spacer(modifier = Modifier.width(16.dp))
-            SocialCircleButton(imageResId = R.drawable.apple)
         }
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -262,7 +260,6 @@ fun CustomSmallTextField(
     keyboardType: KeyboardType = KeyboardType.Text
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
-    // FIX: Tambahkan import androidx.compose.foundation.interaction.MutableInteractionSource
     val interactionSource = remember { MutableInteractionSource() }
 
     Column {
