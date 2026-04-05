@@ -5,8 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Widgets
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Widgets
 import androidx.compose.material3.*
@@ -37,7 +41,6 @@ class MainActivity : ComponentActivity() {
                     matchViewModel.loadData(context)
                 }
 
-                // Ambil rute saat ini untuk menyembunyikan BottomBar di Splash/Login/Register
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
@@ -64,46 +67,54 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppBottomNavigation(navController: NavHostController, matchViewModel: MatchViewModel) {
     val items = listOf(
-        Triple("Home", "home", Icons.Default.Home),
-        Triple("Insights", "insights", Icons.Outlined.Widgets),
-        Triple("Wishlist", "wishlist", Icons.Outlined.FavoriteBorder),
-        Triple("Profile", "profile", Icons.Outlined.Person)
+        Quadruple("Home", "home", Icons.Outlined.Home, Icons.Filled.Home),
+        Quadruple("Insights", "insights", Icons.Outlined.Widgets, Icons.Filled.Widgets),
+        Quadruple("Wishlist", "wishlist", Icons.Outlined.FavoriteBorder, Icons.Filled.Favorite),
+        Quadruple("Profile", "profile", Icons.Outlined.Person, Icons.Filled.Person)
     )
 
     NavigationBar(
         containerColor = Color.White,
-        tonalElevation = 0.dp // MENGHILANGKAN GARIS HITAM TIPIS DI ATAS NAVBAR
+        tonalElevation = 0.dp
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
-        items.forEach { (label, route, icon) ->
+        items.forEach { (label, route, unselectedIcon, selectedIcon) ->
             val isSelected = currentRoute == route
 
             NavigationBarItem(
                 selected = isSelected,
                 onClick = {
                     if (currentRoute != route) {
-                        if ((route == "wishlist" || route == "profile") && !matchViewModel.isLoggedIn) {
-                            // PERBAIKAN: Tambahkan blok navigasi agar tidak membuka login berkali-kali
-                            navController.navigate("login") {
-                                launchSingleTop = true // Kunci agar aplikasi tidak buka banyak layar login
-                                restoreState = true
-                            }
+                        // Navigasi langsung dijalankan tanpa menunggu state lain
+                        val targetRoute = if ((route == "wishlist" || route == "profile") && !matchViewModel.isLoggedIn) {
+                            "login"
                         } else {
-                            // Navigasi normal untuk Home & Insights
-                            navController.navigate(route) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
+                            route
+                        }
+
+                        navController.navigate(targetRoute) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
                             }
+                            launchSingleTop = true
+                            restoreState = true
                         }
                     }
                 },
-                icon = { Icon(icon, contentDescription = label) },
-                label = { Text(label, fontFamily = MyCustomFontFamily) },
+                icon = {
+                    Icon(
+                        imageVector = if (isSelected) selectedIcon else unselectedIcon,
+                        contentDescription = label
+                    )
+                },
+                label = {
+                    Text(
+                        text = label,
+                        fontFamily = MyCustomFontFamily,
+                    )
+                },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Color.Black,
                     indicatorColor = Color(0xFFFFD1E3),
@@ -115,3 +126,5 @@ fun AppBottomNavigation(navController: NavHostController, matchViewModel: MatchV
         }
     }
 }
+
+data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)

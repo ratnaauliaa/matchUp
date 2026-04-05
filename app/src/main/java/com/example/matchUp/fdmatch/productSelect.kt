@@ -13,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -23,32 +22,33 @@ import com.example.matchUp.ui.theme.MyCustomFontFamily
 @Composable
 fun ProductSelectionScreen(
     selectedBrandName: String,
-    productListFromDb: List<Product>, // Hasil kiriman dari ViewModel
+    productListFromDb: List<Product>,
     onBack: () -> Unit,
     onNext: (Product) -> Unit
 ) {
     var showFullList by remember { mutableStateOf(false) }
     var selectedProduct by remember { mutableStateOf<Product?>(null) }
 
-    // --- PENGAMAN UTAMA: Jika Brand tidak punya produk di database ---
+    // --- ERROR STATE: If no products found in database ---
     if (productListFromDb.isEmpty()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
-                .padding(32.dp),
+                .padding(20.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Database Belum Tersedia",
+                text = "Database Unavailable",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                fontFamily = MyCustomFontFamily
+                fontFamily = MyCustomFontFamily,
+                color = Color.Black
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "Maaf, produk untuk brand $selectedBrandName belum ada di database produk kami.",
+                text = "We're sorry, products for $selectedBrandName are not yet available in our database.",
                 fontSize = 14.sp,
                 color = Color.Gray,
                 textAlign = TextAlign.Center,
@@ -60,11 +60,10 @@ fun ProductSelectionScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Kembali Pilih Brand", color = Color.White)
+                Text("Go Back to Brand Selection", color = Color.White)
             }
         }
     } else {
-        // --- TAMPILAN JIKA DATA ADA ---
         if (showFullList) {
             ProductListScreen(
                 brandName = selectedBrandName,
@@ -80,70 +79,117 @@ fun ProductSelectionScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.White)
-                    .padding(20.dp)
+                    .padding(16.dp)
             ) {
-                // Header & Progress
-                Row(modifier = Modifier.fillMaxWidth().statusBarsPadding(), verticalAlignment = Alignment.CenterVertically) {
+                // --- PROGRESS BAR & BACK BUTTON ---
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    SegmentedProgressBar(currentStep = 2, totalSteps = 3)
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     IconButton(
                         onClick = onBack,
-                        modifier = Modifier.size(40.dp).border(1.dp, Color.LightGray, RoundedCornerShape(12.dp))
+                        modifier = Modifier
+                            .size(40.dp)
+                            .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(10.dp))
                     ) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", modifier = Modifier.size(20.dp))
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            tint = Color.Black,
+                            contentDescription = "Back",
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
-                    Spacer(modifier = Modifier.width(15.dp))
-                    LinearProgressIndicator(
-                        progress = { 0.66f },
-                        modifier = Modifier.fillMaxWidth().height(8.dp),
-                        color = Color.Black,
-                        trackColor = Color(0xFFF0F0F0),
-                        strokeCap = StrokeCap.Round
-                    )
                 }
 
-                Spacer(modifier = Modifier.height(35.dp))
-                Text("Step 2", fontSize = 32.sp, fontWeight = FontWeight.Bold, fontFamily = MyCustomFontFamily)
+                Spacer(modifier = Modifier.height(30.dp))
+
                 Text(
-                    text = "What product do you use from $selectedBrandName?",
-                    fontSize = 16.sp,
-                    color = Color.Gray,
-                    fontFamily = MyCustomFontFamily,
-                    modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
+                    text = "Step 2",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    fontFamily = MyCustomFontFamily
                 )
 
-                // Search Bar Trigger
-                Box(modifier = Modifier.fillMaxWidth().clickable { showFullList = true }) {
-                    OutlinedTextField(
-                        value = selectedProduct?.product_name ?: "",
-                        onValueChange = { },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = false,
-                        placeholder = { Text("Search product") },
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                        trailingIcon = {
-                            if (selectedProduct != null) {
-                                IconButton(onClick = { selectedProduct = null }) {
-                                    Icon(Icons.Default.Close, contentDescription = "Clear")
-                                }
-                            }
-                        },
-                        shape = RoundedCornerShape(15.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            disabledBorderColor = if (selectedProduct != null) Color.Black else Color(0xFFE0E0E0),
-                            disabledTextColor = Color.Black
+                Text(
+                    text = "What product do you use from $selectedBrandName?",
+                    fontSize = 15.sp,
+                    color = Color.Gray,
+                    fontFamily = MyCustomFontFamily,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                // --- SEARCH BAR (CUSTOM BOX - SAME AS STEP 1) ---
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .border(
+                            width = 1.dp,
+                            color = if (selectedProduct != null) Color.Black else Color(0xFFE0E0E0),
+                            shape = RoundedCornerShape(20.dp)
                         )
-                    )
+                        .clickable { showFullList = true }
+                        .padding(horizontal = 12.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null,
+                            tint = Color.Gray,
+                            modifier = Modifier.size(20.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(10.dp))
+
+                        Text(
+                            text = selectedProduct?.product_name ?: "Search product",
+                            color = if (selectedProduct == null) Color.LightGray else Color.Black,
+                            fontSize = 15.sp,
+                            fontFamily = MyCustomFontFamily,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        if (selectedProduct != null) {
+                            IconButton(
+                                onClick = { selectedProduct = null },
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Clear",
+                                    tint = Color.Gray,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
 
+                // --- FLOATING ACTION BUTTON ---
                 if (selectedProduct != null) {
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomEnd) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.BottomEnd
+                    ) {
                         FloatingActionButton(
                             onClick = { onNext(selectedProduct!!) },
                             containerColor = Color(0xFFFFD1E3),
                             contentColor = Color.Black,
                             shape = CircleShape,
-                            modifier = Modifier.padding(bottom = 10.dp).size(56.dp)
+                            elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp),
+                            modifier = Modifier
+                                .padding(bottom = 30.dp, end = 20.dp)
+                                .size(60.dp)
                         ) {
                             Icon(Icons.Default.ArrowForward, contentDescription = "Next")
                         }

@@ -4,19 +4,18 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 
     id("com.google.gms.google-services")
-    id("kotlin-parcelize") // Ini untuk Model Data kita
+    id("kotlin-parcelize")
 }
 
 android {
     namespace = "com.example.matchUp"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 35
+
 
     defaultConfig {
         applicationId = "com.example.matchUp"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -55,6 +54,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.compose.foundation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -66,7 +66,6 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("androidx.compose.runtime:runtime-livedata:1.7.0")
-    implementation("io.coil-kt:coil-compose:2.4.0")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("io.coil-kt:coil-compose:2.5.0")
 }

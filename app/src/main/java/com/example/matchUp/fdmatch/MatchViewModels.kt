@@ -49,7 +49,21 @@ data class UndertoneDataWrapper(
     val undertone_results: List<UndertoneResult>
 )
 
-// Pindahkan ke sini agar global
+// Model untuk menyimpan produk hasil match di dalam history
+data class MatchedProduct(
+    val brand: String,
+    val productName: String,
+    val shadeName: String,
+    val imageUrl: String
+)
+
+data class HistoryItem(
+    val date: String,
+    val details: List<String>,
+    val inputProducts: List<SelectedMatchData>, // Sudah disamakan
+    val matchedProducts: List<MatchedProduct>
+)
+
 data class Rgb(val r: Int, val g: Int, val b: Int)
 
 // =====================================================================
@@ -74,7 +88,7 @@ class MatchViewModel : ViewModel() {
     var selectedShade by mutableStateOf<Shade?>(null)
 
     var selectedMatches = mutableStateListOf<SelectedMatchData>()
-    var historyList = mutableStateListOf<HistoryData>()
+    var historyList = mutableStateListOf<HistoryItem>()
     private var lastSavedMatches: List<SelectedMatchData> = listOf()
 
     // --- WISHLIST & INSIGHT STATE ---
@@ -90,12 +104,16 @@ class MatchViewModel : ViewModel() {
     var finalUndertone by mutableStateOf("")
 
     // 1. Wishlist Logic
-    fun toggleSaveProduct(product: Product) {
-        val existing = savedProducts.find { it.product_name == product.product_name }
-        if (existing != null) {
-            savedProducts.remove(existing)
+    // Di MatchViewModel.kt
+    fun toggleSaveProduct(product: Product, currentBrand: String) {
+        val index = savedProducts.indexOfFirst { it.product_name == product.product_name }
+
+        if (index != -1) {
+            savedProducts.removeAt(index)
         } else {
-            savedProducts.add(0, product)
+            // PAKSA brand-nya diisi dari parameter yang dikirim
+            val fixedProduct = product.copy(brand = currentBrand)
+            savedProducts.add(0, fixedProduct)
         }
     }
 
@@ -170,21 +188,28 @@ class MatchViewModel : ViewModel() {
         selectedShade = null
     }
 
-    fun saveMatchToHistory() {
-        if (selectedMatches.isNotEmpty() && selectedMatches.toList() != lastSavedMatches) {
-            val sdf = SimpleDateFormat("EEEE, d MMMM yyyy", Locale.getDefault())
-            val currentDate = sdf.format(Date())
-            val fullDetails = selectedMatches.map {
-                "${it.brandName} ${it.product.product_name} - ${it.shade.shade_name}"
-            }
-            historyList.add(0, HistoryData(currentDate, fullDetails))
-            lastSavedMatches = selectedMatches.toList()
+    fun saveCurrentMatchToHistory(results: List<MatchedProduct>) {
+        val currentDetails = selectedMatches.map {
+            "${it.brandName} - ${it.product.product_name} (${it.shade.shade_name})"
         }
+
+        val lastHistory = historyList.firstOrNull()
+        if (lastHistory != null && lastHistory.details == currentDetails) {
+            return
+        }
+
+        val newHistory = HistoryItem(
+            date = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date()),
+            details = currentDetails,
+            // Menggunakan .toList() untuk membuat salinan data saat ini (Immutable)
+            inputProducts = selectedMatches.toList(),
+            matchedProducts = results
+        )
+        historyList.add(0, newHistory)
     }
 
     fun clearAllHistory() {
         historyList.clear()
-        lastSavedMatches = listOf()
     }
 
     // 5. Data Loading
@@ -199,10 +224,8 @@ class MatchViewModel : ViewModel() {
 
             val articlesJson = context.assets.open("articles_data.json").bufferedReader().use { it.readText() }
             allArticles = gson.fromJson(articlesJson, object : TypeToken<List<Article>>() {}.type)
-
-            Log.d("MatchVM", "✅ All Data Loaded Successfully")
         } catch (e: Exception) {
-            Log.e("MatchVM", "❌ Error loading data: ${e.message}")
+            Log.e("MatchVM", "Error loading data: ${e.message}")
         }
     }
 

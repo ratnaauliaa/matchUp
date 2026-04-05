@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext // Tambahan untuk JSON
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -49,9 +49,7 @@ fun SetupNavGraph(
                     }
                 },
                 onBack = {
-                    // PERBAIKAN: Jika user klik Back di halaman login, arahkan ke Home
                     navController.navigate("home") {
-                        // Hapus halaman login dari history agar tidak balik lagi ke login saat di home
                         popUpTo("login") { inclusive = true }
                     }
                 },
@@ -82,7 +80,7 @@ fun SetupNavGraph(
                 viewModel = matchViewModel,
                 navController = navController,
                 userName = matchViewModel.userName,
-                isLoggedIn = matchViewModel.isLoggedIn, // Pastikan parameter ini ada di MainContent
+                isLoggedIn = matchViewModel.isLoggedIn,
                 onProfileClick = {
                     // Jika mau Profile juga dikunci:
                     if (matchViewModel.isLoggedIn) {
@@ -111,7 +109,6 @@ fun SetupNavGraph(
                     }
                 },
                 onInsightClick = {
-                    // Insight/Artikel biasanya dibebaskan (tidak perlu cek login)
                     navController.navigate("insights")
                 }
             )
@@ -248,7 +245,6 @@ fun SetupNavGraph(
         }
 
         // --- PROFILE ---
-        // --- PROFILE ---
         composable("profile") {
             ProfileScreen(
                 viewModel = matchViewModel,
@@ -256,7 +252,6 @@ fun SetupNavGraph(
                     // 1. Reset status login dan data user di ViewModel
                     matchViewModel.isLoggedIn = false
                     matchViewModel.updateUserName("Guest")
-                    // matchViewModel.userEmail = "" // Jika ada variabel email, kosongkan juga
 
                     // 2. Bersihkan semua history dan pindah ke Login
                     navController.navigate("login") {
@@ -274,10 +269,8 @@ fun SetupNavGraph(
         // --- 7: UNDERTONE FEATURE ---
         composable("undertone_test") {
             UndertoneTestScreen(
-                // Tambahkan viewModel di sini kalau error
                 onBack = { navController.popBackStack() },
-                onFinish = { result -> // Tangkap hasil tesnya di sini
-                    // Simpan hasil ke ViewModel kalau perlu
+                onFinish = { result ->
                     matchViewModel.finalUndertone = result
                     navController.navigate("undertone_result")
                 }
@@ -286,26 +279,29 @@ fun SetupNavGraph(
 
         composable("undertone_result") {
             val context = LocalContext.current
-            // 1. Baca data dari JSON (menggunakan fungsi helper yang tadi)
-            val allResults = matchViewModel.loadUndertoneResultsFromJson(context)
 
-            // 2. Ambil hasil tes dari ViewModel
+            // 1. Ambil data dari ViewModel
+            val allResults = matchViewModel.loadUndertoneResultsFromJson(context)
             val userResult = matchViewModel.finalUndertone // Misal: "warm"
 
-            // 3. Filter data sesuai hasil
+            // 2. Cari data yang cocok
             val resultData = allResults.find { it.undertone_id == userResult.lowercase() }
 
             if (resultData != null) {
                 UndertoneResultScreen(
                     resultData = resultData,
                     onBackToHome = {
+                        // Navigasi balik ke Home dan bersihkan backstack
                         navController.navigate("home") {
                             popUpTo("home") { inclusive = true }
                         }
+                    },
+                    onStartMatchClick = {
+                        navController.navigate("match_step1")
                     }
                 )
             } else {
-                // Handle error kalau data tidak ketemu
+                // Jika data tidak ditemukan, balik ke home
                 LaunchedEffect(Unit) {
                     navController.navigate("home")
                 }

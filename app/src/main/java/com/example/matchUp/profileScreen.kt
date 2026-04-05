@@ -9,10 +9,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,7 +41,7 @@ fun ProfileScreen(
         // --- HEADER: FOTO & NAMA ---
         Box(contentAlignment = Alignment.BottomEnd) {
             AsyncImage(
-                model = "https://ui-avatars.com/api/?name=${viewModel.userName}&background=FFD1E3&color=fff",
+                model = "https://ui-avatars.com/api/?name=${viewModel.userName}&background=E8EAF6&color=000",
                 contentDescription = "Profile Picture",
                 modifier = Modifier
                     .size(100.dp)
@@ -55,37 +57,95 @@ fun ProfileScreen(
                     .offset(x = (-4).dp, y = (-4).dp)
                     .clickable { onNavigateToEditProfile() }
             ) {
-                Icon(Icons.Default.Edit, null, modifier = Modifier.padding(6.dp), tint = Color.Black)
+                Icon(
+                    Icons.Default.Edit,
+                    null,
+                    modifier = Modifier.padding(6.dp),
+                    tint = Color.Black
+                )
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(15.dp))
 
-        Text(text = viewModel.userName, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.Black, fontFamily = MyCustomFontFamily)
-        Text(text = viewModel.userEmail, fontSize = 14.sp, color = Color.Gray, fontFamily = MyCustomFontFamily)
+        Text(
+            text = viewModel.userName,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            fontFamily = MyCustomFontFamily
+        )
+        Spacer(modifier = Modifier.height(5.dp))
+        Text(
+            text = viewModel.userEmail,
+            fontSize = 15.sp,
+            color = Color.Gray,
+            fontFamily = MyCustomFontFamily
+        )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        // --- MENU GROUP: MY ACCOUNT (SESUAI GAMBAR) ---
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 12.dp),
+            color = Color(0xFFF0F0F0),
+            thickness = 1.dp
+        )
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        // --- MENU GROUP: MY ACCOUNT  ---
         ProfileSectionHeader("My Account")
         ProfileMenuItem(Icons.Default.Person, "Edit Profile", onClick = onNavigateToEditProfile)
         ProfileMenuItem(Icons.Default.Key, "Change Password")
-        // TETEP ADA HISTORY DI SINI
         ProfileMenuItem(Icons.Default.History, "History", onClick = onNavigateToHistory)
         ProfileMenuItem(Icons.Default.Translate, "Languages")
         ProfileMenuItem(Icons.Default.Logout, "Sign Out", textColor = Color.Red, onClick = onLogout)
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(10.dp))
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 12.dp),
+            color = Color(0xFFF0F0F0),
+            thickness = 1.dp
+        )
+
+        Spacer(modifier = Modifier.height(5.dp))
         ProfileSectionHeader("App Info")
         ProfileMenuItem(Icons.Default.HelpOutline, "FAQ")
         ProfileMenuItem(Icons.Default.Info, "Privacy Policy")
 
         // --- FOOTER ---
         Spacer(modifier = Modifier.height(40.dp))
-        Text("matchUp", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-        Text("Version 1.4", fontSize = 10.sp, color = Color.Gray)
-        Text("Created with beauty of love.", fontSize = 10.sp, color = Color.Gray)
-        Spacer(modifier = Modifier.height(40.dp))
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_launcher),
+                contentDescription = "App Logo Footer",
+                modifier = Modifier
+                    .height(45.dp)
+                    .alpha(0.6f),
+                contentScale = ContentScale.Fit
+            )
+
+            Text(
+                text = "Version 1.0",
+                fontSize = 11.sp,
+                color = Color.Gray,
+                fontFamily = MyCustomFontFamily
+            )
+
+            Text(
+                text = "Created with beauty of love.",
+                fontSize = 11.sp,
+                color = Color.Gray,
+                fontFamily = MyCustomFontFamily
+            )
+        }
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
@@ -113,7 +173,7 @@ fun ProfileMenuItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(horizontal = 24.dp, vertical = 14.dp),
+            .padding(horizontal = 24.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(

@@ -17,9 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -34,9 +32,8 @@ fun BrandSelectionScreen(
     var selectedBrand by remember { mutableStateOf("") }
 
     if (showFullList) {
-        // --- Memanggil BrandListScreen dengan data asli ---
         BrandListScreen(
-            brandListFromDbFull = matchViewModel.allBrandList, // Kirim list objek utuh (BrandInfo)
+            brandListFromDbFull = matchViewModel.allBrandList,
             onBrandSelected = { brand ->
                 selectedBrand = brand
                 showFullList = false
@@ -48,88 +45,110 @@ fun BrandSelectionScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
-                .padding(20.dp)
+                .padding(16.dp)
         ) {
-            // --- Progress Bar & Back Button ---
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            // --- PROGRESS BAR & BACK BUTTON ---
+            Column(modifier = Modifier.fillMaxWidth()) {
+                SegmentedProgressBar(currentStep = 1, totalSteps = 3)
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 IconButton(
                     onClick = onBack,
                     modifier = Modifier
                         .size(40.dp)
-                        .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp))
+                        .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(10.dp))
                 ) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", modifier = Modifier.size(20.dp))
+                    Icon(Icons.Default.ArrowBack, tint = Color.Black, contentDescription = "Back", modifier = Modifier.size(20.dp))
                 }
-                Spacer(modifier = Modifier.width(15.dp))
-                LinearProgressIndicator(
-                    progress = { 0.33f },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp),
-                    color = Color.Black,
-                    trackColor = Color(0xFFF0F0F0),
-                    strokeCap = StrokeCap.Round
-                )
             }
 
-            Spacer(modifier = Modifier.height(35.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
             Text(
                 text = "Step 1",
-                fontSize = 32.sp,
+                fontSize = 24.sp,
+                color = Color.Black,
                 fontWeight = FontWeight.Bold,
                 fontFamily = MyCustomFontFamily
             )
             Text(
                 text = "Enter a brand of foundation or concealer that you wear:",
-                fontSize = 16.sp,
+                fontSize = 15.sp,
                 color = Color.Gray,
                 fontFamily = MyCustomFontFamily,
-                lineHeight = 22.sp,
-                modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
+                modifier = Modifier.padding(top = 4.dp)
             )
 
-            // --- Search Bar (Read-Only, Trigger List) ---
-            OutlinedTextField(
-                value = selectedBrand,
-                onValueChange = { },
+            Spacer(modifier = Modifier.height(30.dp))
+
+            // --- SEARCH BAR (METODE BOX: LEBIH STABIL & COMPACT) ---
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { showFullList = true },
-                enabled = false,
-                placeholder = { Text("Search brand", color = Color.LightGray) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
-                trailingIcon = {
+                    .height(48.dp)
+                    .border(
+                        width = 1.dp,
+                        color = if (selectedBrand.isNotEmpty()) Color.Black else Color(0xFFE0E0E0),
+                        shape = RoundedCornerShape(20.dp)
+                    )
+                    .clickable { showFullList = true }
+                    .padding(horizontal = 12.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null,
+                        tint = Color.Gray,
+                        modifier = Modifier.size(20.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Text(
+                        text = if (selectedBrand.isEmpty()) "Search brand" else selectedBrand,
+                        color = if (selectedBrand.isEmpty()) Color.LightGray else Color.Black,
+                        fontSize = 15.sp,
+                        fontFamily = MyCustomFontFamily,
+                        modifier = Modifier.weight(1f)
+                    )
+
                     if (selectedBrand.isNotEmpty()) {
-                        IconButton(onClick = { selectedBrand = "" }) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear")
+                        IconButton(
+                            onClick = { selectedBrand = "" },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Clear",
+                                tint = Color.Gray,
+                                modifier = Modifier.size(18.dp)
+                            )
                         }
                     }
-                },
-                singleLine = true,
-                shape = RoundedCornerShape(15.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    // Memberikan warna hitam jika sudah terpilih agar terlihat aktif
-                    disabledBorderColor = if (selectedBrand.isNotEmpty()) Color.Black else Color(0xFFE0E0E0),
-                    disabledTextColor = Color.Black,
-                    disabledPlaceholderColor = Color.LightGray
-                )
-            )
+                }
+            }
 
             Spacer(modifier = Modifier.weight(1f))
 
             if (selectedBrand.isNotEmpty()) {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomEnd) {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.BottomEnd
+                ) {
                     FloatingActionButton(
                         onClick = { onNext(selectedBrand) },
                         containerColor = Color(0xFFFFD1E3),
                         contentColor = Color.Black,
                         shape = CircleShape,
                         elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp),
-                        modifier = Modifier.padding(bottom = 10.dp).size(56.dp)
+                        modifier = Modifier
+                            .padding(bottom = 30.dp, end = 20.dp)
+                            .size(60.dp)
                     ) {
                         Icon(Icons.Default.ArrowForward, contentDescription = "Next")
                     }

@@ -22,15 +22,15 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun NotificationScreen(
-onBack: () -> Unit = {} // Tambahkan default value {} agar Preview tidak error
+onBack: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 20.dp)
     ) {
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(30.dp))
 
         // --- TOP BAR ---
         Row(
@@ -55,13 +55,12 @@ onBack: () -> Unit = {} // Tambahkan default value {} agar Preview tidak error
                 text = "Notification",
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
-                fontSize = 20.sp,
+                fontSize = 24.sp,
                 fontFamily = MyCustomFontFamily,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black
             )
 
-            // Spacer kosong agar judul tetap di tengah
             Spacer(modifier = Modifier.size(40.dp))
         }
 
@@ -69,22 +68,22 @@ onBack: () -> Unit = {} // Tambahkan default value {} agar Preview tidak error
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 60.dp), // Angkat sedikit ke atas agar tidak terlalu di bawah
+                .padding(bottom = 60.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // GANTI NAMA FILE GAMBAR DISINI
+
             Image(
                 painter = painterResource(id = R.drawable.ic_notif),
                 contentDescription = null,
-                modifier = Modifier.size(250.dp) // Sesuaikan ukuran gambar
+                modifier = Modifier.size(220.dp)
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
                 text = "No Notifications Yet",
-                fontSize = 22.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = MyCustomFontFamily,
                 color = Color.Black
@@ -94,7 +93,7 @@ onBack: () -> Unit = {} // Tambahkan default value {} agar Preview tidak error
 
             Text(
                 text = "There are no notifications at the moment. All notifications we send will appear here!",
-                fontSize = 14.sp,
+                fontSize = 15.sp,
                 color = Color.Gray,
                 textAlign = TextAlign.Center,
                 fontFamily = MyCustomFontFamily,

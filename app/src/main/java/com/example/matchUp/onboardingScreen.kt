@@ -25,7 +25,6 @@ import com.example.matchUp.ui.theme.MyCustomFontFamily
 
 @Composable
 fun OnboardingScreen(onFinished: () -> Unit) {
-    // Tambahkan modifier di pagerState agar lebih stabil
     val pagerState = rememberPagerState(pageCount = { onboardingPages.size })
     val scope = rememberCoroutineScope()
 
@@ -33,19 +32,18 @@ fun OnboardingScreen(onFinished: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .statusBarsPadding() // Tambahkan ini agar tidak nabrak status bar (jam/baterai)
+            .statusBarsPadding()
             .padding(horizontal = 20.dp)
     ) {
         // --- Bagian Atas: Tombol Skip ---
-        // --- Bagian Atas: Skip Button ---
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(60.dp) // Box ini tetap ada di halaman 3 meski kosong
+                .height(60.dp)
                 .padding(horizontal = 20.dp),
             contentAlignment = Alignment.CenterEnd
         ) {
-            // Tombol skip hanya muncul di halaman 1 & 2
+            // Tombol skip
             if (pagerState.currentPage < onboardingPages.size - 1) {
                 TextButton(
                     onClick = {
@@ -67,8 +65,6 @@ fun OnboardingScreen(onFinished: () -> Unit) {
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.weight(1f),
-            // PENTING: Ubah CenterVertically menjadi Top agar semua halaman
-            // mulai menggambar konten dari titik atas yang sama
             verticalAlignment = Alignment.Top
         ) { pageIndex ->
             val page = onboardingPages[pageIndex]
@@ -76,7 +72,6 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp)
-                    // Tambahkan padding top yang fix agar gambar punya jarak dari area Skip
                     .padding(top = 70.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -84,7 +79,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                     painter = painterResource(id = page.imageRes),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(300.dp) // Pastikan ukuran gambar konsisten di semua halaman
+                        .size(300.dp)
                         .padding(bottom = 20.dp),
                     contentScale = ContentScale.Fit
                 )
@@ -112,7 +107,6 @@ fun OnboardingScreen(onFinished: () -> Unit) {
         }
 
         // --- Bagian Bawah: Indikator & Tombol ---
-        // Pindahkan Indikator ke bawah deskripsi dengan jarak yang pas
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -124,7 +118,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                 Box(
                     modifier = Modifier
                         .padding(horizontal = 4.dp)
-                        .width(if (isActive) 24.dp else 8.dp) // Indikator lonjong vs bulat lebih modern
+                        .width(if (isActive) 24.dp else 8.dp)
                         .height(8.dp)
                         .background(
                             color = if (isActive) Color.Black else Color(0xFFE0E0E0),
@@ -166,6 +160,5 @@ fun OnboardingScreen(onFinished: () -> Unit) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun OnboardingPreview() {
-    // Berikan lambda kosong {} untuk onFinished agar preview bisa jalan
     OnboardingScreen(onFinished = {})
 }

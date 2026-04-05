@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,11 +18,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.matchUp.fdmatch.MatchViewModel
-import com.example.matchUp.fdmatch.Article // Pastikan ini ada agar Article dikenali
+import com.example.matchUp.fdmatch.Article
 import com.example.matchUp.ui.theme.MyCustomFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,20 +54,20 @@ fun InsightsScreen(
                     placeholder = { Text("Search articles", fontSize = 14.sp, color = Color.Gray) },
                     modifier = Modifier
                         .weight(1f)
-                        .height(48.dp), // Naikkan sedikit ke 50dp jika 48dp masih memotong
+                        .height(48.dp),
                     shape = RoundedCornerShape(25.dp),
                     trailingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.White,
                         unfocusedContainerColor = Color.White,
                         disabledContainerColor = Color.White,
-                        focusedIndicatorColor = Color.Transparent, // Hilangkan garis bawah
+                        focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                     ),
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.width(12.dp))
-                // Icon Bookmark sesuai gambar
+
                 Icon(
                     imageVector = Icons.Default.BookmarkBorder,
                     contentDescription = null,
@@ -79,13 +82,13 @@ fun InsightsScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 12.dp, horizontal = 20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween // Ini kuncinya agar menyebar
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             categories.forEach { category ->
                 val isSelected = viewModel.selectedInsightCategory == category
                 Column(
                     modifier = Modifier
-                        .weight(1f) // Memberi ruang yang sama rata untuk tiap tab
+                        .weight(1f)
                         .clickable { viewModel.selectedInsightCategory = category },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -97,10 +100,9 @@ fun InsightsScreen(
                         fontSize = 15.sp
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    // Garis bawah yang memanjang sesuai lebar tab jika dipilih
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth() // Garis selebar teks tab
+                            .fillMaxWidth()
                             .height(2.dp)
                             .background(if (isSelected) Color.Black else Color.Transparent)
                     )
@@ -132,6 +134,7 @@ fun InsightsScreen(
 fun ArticleCard(article: Article, onClick: () -> Unit) {
     val context = LocalContext.current
 
+    // Optimasi pengambilan resource ID
     val imageResId = remember(article.imageUrl) {
         val id = context.resources.getIdentifier(
             article.imageUrl,
@@ -147,48 +150,82 @@ fun ArticleCard(article: Article, onClick: () -> Unit) {
             .clickable { onClick() }
             .padding(vertical = 16.dp)
     ) {
+        // Kategori Artikel
         Text(
             text = article.category,
             color = Color.Gray,
             fontSize = 12.sp,
-            fontFamily = MyCustomFontFamily
+            fontFamily = MyCustomFontFamily,
+            fontWeight = FontWeight.Medium
         )
+
         Spacer(modifier = Modifier.height(8.dp))
-        Row(modifier = Modifier.fillMaxWidth()) {
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Top // Gambar sejajar dengan baris pertama judul
+        ) {
+            // Gambar Artikel dengan Coil
             AsyncImage(
-                model = imageResId,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageResId)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(85.dp)
-                    .clip(RoundedCornerShape(12.dp)),
+                    .size(90.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFFF5F5F5)),
                 contentScale = ContentScale.Crop
             )
+
             Spacer(modifier = Modifier.width(16.dp))
+
             Column(modifier = Modifier.weight(1f)) {
+                // Judul Artikel (Warna Hitam)
                 Text(
                     text = article.title,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Medium,
                     fontSize = 15.sp,
                     color = Color.Black,
                     fontFamily = MyCustomFontFamily,
-                    maxLines = 2
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
+
                 Spacer(modifier = Modifier.height(4.dp))
+
+                // Deskripsi Artikel
                 Text(
                     text = article.description,
                     fontSize = 12.sp,
                     color = Color.Gray,
                     maxLines = 2,
                     fontFamily = MyCustomFontFamily,
-                    lineHeight = 18.sp
+                    lineHeight = 18.sp,
+                    overflow = TextOverflow.Ellipsis
                 )
-                Text(
-                    text = "Read more >",
-                    color = Color.Gray,
-                    fontSize = 11.sp,
-                    modifier = Modifier.align(Alignment.End).padding(top = 4.dp),
-                    fontFamily = MyCustomFontFamily
-                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Row untuk "Read more" dan Icon agar sejajar horizontal
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text(
+                        text = "Read more",
+                        color = Color.Gray,
+                        fontSize = 10.sp,
+                        fontFamily = MyCustomFontFamily
+                    )
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = null,
+                        modifier = Modifier.size(12.dp),
+                        tint = Color.Gray
+                    )
+                }
             }
         }
     }

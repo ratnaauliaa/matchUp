@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
@@ -28,7 +27,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BrandListScreen(
-    brandListFromDbFull: List<BrandInfo>, // Menggunakan list objek lengkap
+    brandListFromDbFull: List<BrandInfo>,
     onBrandSelected: (String) -> Unit,
     onClose: () -> Unit
 ) {
@@ -51,14 +50,14 @@ fun BrandListScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .statusBarsPadding()
-                .padding(top = 20.dp, start = 8.dp, end = 16.dp, bottom = 12.dp),
+                .padding(top = 20.dp, start = 0.dp, end = 16.dp, bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onClose) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Close",
+                    tint = Color.Black,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -68,7 +67,7 @@ fun BrandListScreen(
                 onValueChange = { searchText = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(45.dp),
+                    .height(48.dp),
                 singleLine = true,
                 textStyle = LocalTextStyle.current.copy(
                     color = Color.Black,
@@ -77,7 +76,7 @@ fun BrandListScreen(
                 ),
                 decorationBox = { innerTextField ->
                     Surface(
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(20.dp),
                         border = BorderStroke(
                             width = 1.dp,
                             color = if (searchText.isNotEmpty()) Color.Black else Color(0xFFDEDEDE)
@@ -121,9 +120,9 @@ fun BrandListScreen(
                         ) {
                             Text(
                                 text = letter.toString(),
-                                fontSize = 14.sp,
+                                fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.Gray
+                                color = Color.Black
                             )
                         }
                     }
@@ -146,7 +145,7 @@ fun BrandListScreen(
                             ) {
                                 Text(
                                     text = brandItem.name,
-                                    fontSize = 14.sp,
+                                    fontSize = 15.sp,
                                     fontFamily = MyCustomFontFamily,
                                     color = if (isActive) Color.Black else Color.Gray,
                                     modifier = Modifier.weight(1f)

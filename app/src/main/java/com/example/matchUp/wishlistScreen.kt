@@ -3,8 +3,11 @@ package com.example.matchUp
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.*
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+// --- FIX IMPORT: Menggunakan alias agar tidak bentrok ---
+import androidx.compose.foundation.lazy.grid.items as itemsGrid
+import androidx.compose.foundation.lazy.items as itemsList
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -37,143 +40,109 @@ fun WishlistScreen(viewModel: MatchViewModel, navController: NavHostController) 
     val categories = listOf("All", "Face", "Lips")
     var isGridView by remember { mutableStateOf(true) }
 
-
-    // Logic filter tetap sama
-    val filteredProducts = viewModel.savedProducts.filter {
-        it.product_name.contains(searchQuery, ignoreCase = true) ||
-                it.brand.contains(searchQuery, ignoreCase = true)
+    val filteredProducts by remember(viewModel.savedProducts.size, searchQuery, selectedTab) {
+        derivedStateOf {
+            if (selectedTab == 2) {
+                emptyList<Product>()
+            } else {
+                viewModel.savedProducts.filter {
+                    val nameMatch = it.product_name?.contains(searchQuery, ignoreCase = true) ?: false
+                    val brandMatch = it.brand?.contains(searchQuery, ignoreCase = true) ?: false
+                    nameMatch || brandMatch
+                }
+            }
+        }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        // --- PINK HEADER SECTION ---
-        Column(
+    Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color(0xFFFFD1E3))
-                .padding(horizontal = 20.dp, vertical = 16.dp)
+                .padding(top = 30.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
         ) {
-            Spacer(modifier = Modifier.height(40.dp))
-
-            OutlinedTextField(
+            TextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Search product", fontSize = 14.sp, fontFamily = MyCustomFontFamily) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)
-                    .background(Color.White, CircleShape),
-                shape = CircleShape,
-                trailingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color.Transparent,
-                    focusedBorderColor = Color.Transparent,
+                placeholder = { Text("Search product", fontSize = 14.sp, color = Color.Gray, fontFamily = MyCustomFontFamily) },
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                shape = RoundedCornerShape(25.dp),
+                trailingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
+                colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
+                    unfocusedContainerColor = Color.White,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
                 ),
                 singleLine = true
             )
+        }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                categories.forEachIndexed { index, title ->
-                    Column(
-                        modifier = Modifier
-                            .clickable { selectedTab = index }
-                            .padding(horizontal = 12.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = title,
-                            fontSize = 15.sp,
-                            fontFamily = MyCustomFontFamily,
-                            fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
-                            color = if (selectedTab == index) Color.Black else Color.Gray
-                        )
-                        if (selectedTab == index) {
-                            Box(
-                                modifier = Modifier
-                                    .padding(top = 4.dp)
-                                    .width(35.dp)
-                                    .height(2.5.dp)
-                                    .background(Color.Black, RoundedCornerShape(2.dp))
-                            )
-                        }
+        Row(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
+            categories.forEachIndexed { index, title ->
+                val isSelected = selectedTab == index
+                Column(
+                    modifier = Modifier.weight(1f).clickable { selectedTab = index },
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = title,
+                        fontSize = 15.sp,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        color = if (isSelected) Color.Black else Color.Gray,
+                        fontFamily = MyCustomFontFamily
+                    )
+                    if (isSelected) {
+                        Box(modifier = Modifier.width(40.dp).height(2.dp).background(Color.Black))
                     }
                 }
             }
         }
 
-        // --- CONTENT SECTION ---
-        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 16.dp)) {
-            if (filteredProducts.isEmpty()) {
-                EmptyWishlistContent()
-            } else {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "${filteredProducts.size} Items",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = MyCustomFontFamily
-                    )
+        if (filteredProducts.isEmpty()) {
+            EmptyWishlistContent()
+        } else {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("${filteredProducts.size} Items", color = Color.Black, fontWeight = FontWeight.Medium, fontSize = 14.sp, fontFamily = MyCustomFontFamily)
+                IconButton(onClick = { isGridView = !isGridView }) {
+                    Icon(imageVector = if (isGridView) Icons.Default.List else Icons.Default.GridView, contentDescription = null, tint = Color.Black)
+                }
+            }
 
-                    IconButton(onClick = { isGridView = !isGridView }) {
-                        Icon(
-                            imageVector = if (isGridView) Icons.Default.List else Icons.Default.GridView,
-                            contentDescription = "Switch View",
-                            modifier = Modifier.size(24.dp),
-                            tint = Color.DarkGray
+            if (isGridView) {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(bottom = 100.dp)
+                ) {
+                    // MENGGUNAKAN itemsGrid (Alias untuk Grid)
+                    itemsGrid(filteredProducts, key = { it.product_name ?: "" }) { product ->
+                        WishlistProductCard( // Panggil Card untuk tampilan Grid
+                            product = product,
+                            onRemove = { viewModel.toggleSaveProduct(product, product.brand ?: "") },
+                            onClick = { navController.navigate("product_detail/${product.product_name}") }
                         )
                     }
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                if (isGridView) {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        contentPadding = PaddingValues(bottom = 80.dp)
-                    ) {
-                        items(filteredProducts) { product ->
-                            WishlistProductCard(
-                                product = product,
-                                onRemove = { viewModel.toggleSaveProduct(product) },
-                                onClick = {
-                                    // Ini yang akan dijalankan saat kartu diklik
-                                    navController.navigate("product_detail/${product.product_name}")
-                                }
-
-                            )
-                        }
-                    }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(bottom = 80.dp)
-                    ) {
-                        items(filteredProducts) { product ->
-                            WishlistProductListRow(
-                                product = product,
-                                onRemove = { viewModel.toggleSaveProduct(product) },
-                                onClick = {
-                                    navController.navigate("product_detail/${product.product_name}")
-                                }
-                            )
-                        }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(bottom = 100.dp)
+                ) {
+                    // MENGGUNAKAN itemsList (Alias untuk Column)
+                    itemsList(filteredProducts, key = { it.product_name ?: "" }) { product ->
+                        WishlistProductListRow( // Panggil Row untuk tampilan List
+                            product = product,
+                            onRemove = { viewModel.toggleSaveProduct(product, product.brand ?: "") },
+                            onClick = { navController.navigate("product_detail/${product.product_name}") }
+                        )
                     }
                 }
             }
@@ -184,53 +153,39 @@ fun WishlistScreen(viewModel: MatchViewModel, navController: NavHostController) 
 @Composable
 fun WishlistProductCard(product: Product, onRemove: () -> Unit, onClick: () -> Unit) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         border = BorderStroke(1.dp, Color(0xFFF0F0F0)),
         shape = RoundedCornerShape(16.dp)
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+        Column(modifier = Modifier.padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Box(modifier = Modifier.fillMaxWidth()) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(110.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFFF9F9F9)),
+                    modifier = Modifier.fillMaxWidth().height(110.dp).clip(RoundedCornerShape(12.dp)).background(Color.White),
                     contentAlignment = Alignment.Center
                 ) {
                     AsyncImage(
                         model = product.image,
                         contentDescription = null,
                         modifier = Modifier.size(85.dp),
-                        contentScale = ContentScale.Fit
+                        contentScale = ContentScale.Fit,
+                        error = painterResource(id = R.drawable.history_empty)
                     )
                 }
-
                 Surface(
                     shape = CircleShape,
                     color = Color.White.copy(alpha = 0.9f),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(6.dp)
-                        .size(28.dp)
-                        .clickable { onRemove() }
+                    modifier = Modifier.align(Alignment.TopEnd).padding(6.dp).size(30.dp).clickable { onRemove() },
+                    shadowElevation = 2.dp
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        contentDescription = null,
-                        tint = Color.Red,
-                        modifier = Modifier.padding(6.dp)
-                    )
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(Icons.Default.Favorite, null, tint = Color.Red, modifier = Modifier.size(18.dp))
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
-            // .brand sekarang aman karena constructor di MatchViewModels sudah kita perbaiki
-            Text(text = product.brand, fontWeight = FontWeight.Bold, fontFamily = MyCustomFontFamily, fontSize = 13.sp)
-            Text(text = product.product_name, color = Color.Gray, fontFamily = MyCustomFontFamily, fontSize = 11.sp, maxLines = 2)
+            Text(product.brand ?: "Brand", fontWeight = FontWeight.Bold,color = Color.Black, fontSize = 13.sp, fontFamily = MyCustomFontFamily)
+            Text(product.product_name ?: "Product", color = Color.Gray, fontSize = 11.sp, maxLines = 2, textAlign = TextAlign.Center, modifier = Modifier.heightIn(min = 28.dp), fontFamily = MyCustomFontFamily)
         }
     }
 }
@@ -238,42 +193,25 @@ fun WishlistProductCard(product: Product, onRemove: () -> Unit, onClick: () -> U
 @Composable
 fun WishlistProductListRow(product: Product, onRemove: () -> Unit, onClick: () -> Unit) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         border = BorderStroke(1.dp, Color(0xFFF0F0F0)),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             AsyncImage(
                 model = product.image,
                 contentDescription = null,
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFFF9F9F9)),
+                modifier = Modifier.size(60.dp).clip(RoundedCornerShape(8.dp)).background(Color.White),
                 contentScale = ContentScale.Fit
             )
-
             Spacer(modifier = Modifier.width(16.dp))
-
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = product.brand, fontWeight = FontWeight.Bold, fontFamily = MyCustomFontFamily, fontSize = 13.sp)
-                Text(text = product.product_name, color = Color.Gray, fontFamily = MyCustomFontFamily, fontSize = 11.sp, maxLines = 1)
+                Text(product.brand ?: "Brand", fontWeight = FontWeight.Bold, color = Color.Black, fontSize = 13.sp, fontFamily = MyCustomFontFamily)
+                Text(product.product_name ?: "Product", color = Color.Gray, fontSize = 11.sp, maxLines = 1, fontFamily = MyCustomFontFamily)
             }
-
             IconButton(onClick = onRemove) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = null,
-                    tint = Color.Red,
-                    modifier = Modifier.size(24.dp)
-                )
+                Icon(Icons.Default.Favorite, null, tint = Color.Red, modifier = Modifier.size(20.dp))
             }
         }
     }
@@ -281,30 +219,10 @@ fun WishlistProductListRow(product: Product, onRemove: () -> Unit, onClick: () -
 
 @Composable
 fun EmptyWishlistContent() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.history_empty),
-            contentDescription = null,
-            modifier = Modifier.size(180.dp)
-        )
+    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        Image(painter = painterResource(id = R.drawable.history_empty), contentDescription = null, modifier = Modifier.size(180.dp))
         Spacer(modifier = Modifier.height(20.dp))
-        Text(
-            text = "No Wishlist Yet",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = MyCustomFontFamily
-        )
-        Text(
-            text = "No products saved yet.\nYour favorite shades will show up here!",
-            fontSize = 13.sp,
-            color = Color.Gray,
-            fontFamily = MyCustomFontFamily,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp)
-        )
+        Text("No Wishlist Yet", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black, fontFamily = MyCustomFontFamily)
+        Text("Your favorite shades will show up here!", fontSize = 14.sp, color = Color.Gray, textAlign = TextAlign.Center, fontFamily = MyCustomFontFamily)
     }
 }

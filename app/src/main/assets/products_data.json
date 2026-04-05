@@ -152,29 +152,16 @@
     ]
   },
   {
-    "brand": "OMG",
+    "brand": "OMG Oh My Glam",
     "products": [
       {
         "product_name": "Coverlast Two Way Cake",
-        "image": "https://image.femaledaily.com/dyn/210/images/prod-pics/product_1690537981_134879_omg_800x800.jpg",
+        "image": "https://mjbeauty.id/wp-content/uploads/2025/08/1739940722143336.jpeg",
         "description": "A high-performance combination of powder and foundation powered by the latest COLORADVANCED TECH. It delivers medium coverage and a silky-smooth finish to seamlessly mask uneven skin tone and imperfections.",
         "shades": [
           { "shade_name": "21W Light", "hex": "#efdbb2", "undertone": "Warm", "skintone": "Light" },
           { "shade_name": "32N Natural", "hex": "#edc8a3", "undertone": "Neutral", "skintone": "Light Medium" },
           { "shade_name": "41W Sand", "hex": "#e7b78a", "undertone": "Warm", "skintone": "Medium" }
-        ]
-      },
-      {
-        "product_name": "Coverlast Liquid Foundation",
-        "image": "https://storage.googleapis.com/6e927a7a-fad5-437f-bf8d-228eec029d0f/pLpYnalYpX_ESjnUmcuxh.png",
-        "description": "OMG Oh My Glam Coverlast Liquid Foundation is a high-coverage liquid foundation available in 6 stunning shades specifically curated to complement the diverse skin tones of Indonesian women.",
-        "shades": [
-          { "shade_name": "13C Ivory", "hex": "#ecc3b2", "undertone": "Cool", "skintone": "Fair" },
-          { "shade_name": "21W Light", "hex": "#efdbb2", "undertone": "Warm", "skintone": "Light" },
-          { "shade_name": "31W Beige", "hex": "#e0c09f", "undertone": "Warm", "skintone": "Light Medium" },
-          { "shade_name": "32N Natural", "hex": "#edc8a3", "undertone": "Neutral", "skintone": "Light Medium" },
-          { "shade_name": "41W Sand", "hex": "#e7b78a", "undertone": "Warm", "skintone": "Medium" },
-          { "shade_name": "52N Caramel", "hex": "#cda077", "undertone": "Neutral", "skintone": "Medium" }
         ]
       },
       {
@@ -261,7 +248,7 @@
     "products": [
       {
         "product_name": "Minimalist Blurring Serum Skin Tint SPF 35 PA++",
-        "image": "https://esqacosmetics.com/cdn/shop/files/SKINTINT_-_CUSTARD_1200x.jpg?v=1729660025",
+        "image": "https://www.soco.id/cdn-cgi/image/w=360,format=auto,quality=100,dpr=1.5/https://images.soco.id/15594f67-9e99-4cb3-aa4f-47b92939fe73-image-0-1723618858933",
         "description": "Serum-Powered Blurring Skin Tint with medium-buildable coverage that delivers natural velvet finish and 24-Hour longlasting wear. Powered by Blurring MetagramTM Technology.",
         "shades": [
           { "shade_name": "Milkshake", "hex": "#f2ecde", "undertone": "Neutral", "skintone": "Light" },
@@ -278,7 +265,7 @@
       },
       {
         "product_name": "Flawless Cushion Serum SPF 50+ PA+++ - Satin",
-        "image": "https://esqacosmetics.com/cdn/shop/files/SATIN_CUSHION_-_CUSTARD_1200x.jpg?v=1729660086",
+        "image": "https://image.femaledaily.com/dyn/210/images/prod-pics/f2a19fc38c64ba56a878525abb858445.jpg",
         "description": "A 3-in-1 cushion that gives full coverage foundation, infused with 6X premium serum actives to calm, soothe, and brighten skin while providing SPF 50+ PA+++ protection.",
         "shades": [
           { "shade_name": "Milkshake", "hex": "#f2ecde", "undertone": "Neutral", "skintone": "Light" },
@@ -293,7 +280,7 @@
       },
       {
         "product_name": "Minimalist Serum Concealer",
-        "image": "https://esqacosmetics.com/cdn/shop/files/biscuit_1200x.jpg?v=1718965672",
+        "image": "https://s3.ap-southeast-1.amazonaws.com/assets.femaledaily.com/remastering-data/production/product/product-1718179480714-",
         "description": "A hybrid serum-concealer that provides weightless, buildable coverage while improving skin health with multi-active ingredients. Dermatologically tested and safe for all skin types.",
         "shades": [
           { "shade_name": "Milkshake", "hex": "#f2ecde", "undertone": "Neutral", "skintone": "Light" },
@@ -310,7 +297,7 @@
       },
       {
         "product_name": "Flawless Liquid Concealer",
-        "image": "https://esqacosmetics.com/cdn/shop/products/custard_3eda7abe-a648-459e-a1e4-1aac5c3dfe1b_1200x.jpg?v=1636354046",
+        "image": "https://esqacosmetics.com/cdn/shop/products/orange_with_swatch_600x600_crop_center.jpg?v=1638425210",
         "description": "Long-wearing, full coverage, and crease-proof formula that blurs skin imperfections and brightens the under-eye area without flaking.",
         "shades": [
           { "shade_name": "Milkshake", "hex": "#f2ecde", "undertone": "Neutral", "skintone": "Light" },
@@ -327,7 +314,7 @@
       },
       {
         "product_name": "Flawless Powder Foundation",
-        "image": "https://esqacosmetics.com/cdn/shop/products/flawless_powder_foundation_custard_1200x.jpg?v=1636357107",
+        "image": "https://www.soco.id/cdn-cgi/image/w=360,format=auto,quality=100,dpr=1.5/https://images.soco.id/image-0-1606721142130",
         "description": "A long-wearing powder foundation with medium-to-full buildable coverage and a velvet matte finish that controls shine all day.",
         "shades": [
           { "shade_name": "Vanilla", "hex": "#f4e6d0", "undertone": "Warm", "skintone": "Light" },
@@ -338,7 +325,7 @@
       },
       {
         "product_name": "Flawless Micro Setting Powder",
-        "image": "https://esqacosmetics.com/cdn/shop/products/CUSTARD_WITH_SWATCH_1200x.jpg?v=1636355709",
+        "image": "https://www.soco.id/cdn-cgi/image/w=360,format=auto,quality=100,dpr=1.5/https://images.soco.id/e00c967c-a228-49b9-a611-d38ee98eb5b8-image-0-1721363501349",
         "description": "Micro-fine powder that instantly blurs pores and fine lines, sets makeup without looking cakey, and creates a natural radiant effect.",
         "shades": [
           { "shade_name": "Translucent", "hex": "#f3e3d2", "undertone": "Neutral", "skintone": "Light" },

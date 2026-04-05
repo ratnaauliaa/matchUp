@@ -1,5 +1,5 @@
 
-package com.example.matchUp // Ganti dengan nama paket Anda sendiri
+package com.example.matchUp
 import androidx.annotation.DrawableRes
 
 
@@ -16,17 +16,17 @@ val onboardingPages = listOf(
     OnboardingPage(
         title = "Discover Your Undertone",
         description = "Say goodbye to shade confusion,\nstart with your undertone.",
-        imageRes = R.drawable.onbo_1 // Pastikan ada file onbo_1 di res/drawable
+        imageRes = R.drawable.onbo_1
     ),
     OnboardingPage(
         title = "Find Your Perfect Shade",
         description = "Start with your shade,\nmatch across brands.",
-        imageRes = R.drawable.onbo_2 // Pastikan ada file onbo_2 di res/drawable
+        imageRes = R.drawable.onbo_2
     ),
     OnboardingPage(
         title = "No More Trial And Error",
         description = "Save time and skip the trial-and-error",
-        imageRes = R.drawable.onbo_3, // Pastikan ada file onbo_3 di res/drawable
+        imageRes = R.drawable.onbo_3,
         buttonText = "Get Started"
     )
 )

@@ -176,9 +176,8 @@ fun ResetPasswordScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ResetPreview() {
-    // Isi parameter dengan kurung kurawal kosong {} agar tidak error
     ResetPasswordScreen(
-        onBack = { /* tidak melakukan apa-apa di preview */ },
-        onComplete = { /* tidak melakukan apa-apa di preview */ }
+        onBack = {  },
+        onComplete = {  }
     )
 }

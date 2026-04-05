@@ -6,8 +6,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,108 +23,179 @@ import androidx.compose.ui.window.Dialog
 import com.example.matchUp.fdmatch.MatchViewModel
 import com.example.matchUp.ui.theme.MyCustomFontFamily
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
     viewModel: MatchViewModel,
     onBack: () -> Unit,
-    onNavigateToDetail: (Int) -> Unit // Tambahkan parameter navigasi ke detail
+    onNavigateToDetail: (Int) -> Unit
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
     val historyList = viewModel.historyList
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("History", fontWeight = FontWeight.Bold, fontFamily = MyCustomFontFamily) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = null)
-                    }
-                },
-                actions = {
-                    if (historyList.isNotEmpty()) {
-                        TextButton(onClick = { showDeleteDialog = true }) {
-                            Text("Clear", color = Color.Black, fontSize = 14.sp, fontFamily = MyCustomFontFamily)
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White)
+    // Root menggunakan Column + Background White (Tanpa Scaffold)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .padding(horizontal = 20.dp)
+    ) {
+        Spacer(modifier = Modifier.height(30.dp))
+
+        // --- TOP BAR (Identik dengan NotificationScreen) ---
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onBack,
+                modifier = Modifier
+                    .size(40.dp)
+                    .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBackIosNew,
+                    contentDescription = "Back",
+                    modifier = Modifier.size(18.dp),
+                    tint = Color.Black
+                )
+            }
+
+            Text(
+                text = "History",
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center,
+                fontSize = 24.sp,
+                fontFamily = MyCustomFontFamily,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
             )
+
+            // Tombol Clear (Jika ada isi) atau Spacer penyeimbang
+            if (historyList.isNotEmpty()) {
+                TextButton(
+                    onClick = { showDeleteDialog = true },
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Text(
+                        "Clear",
+                        color = Color.Black,
+                        fontSize = 14.sp,
+                        fontFamily = MyCustomFontFamily,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            } else {
+                Spacer(modifier = Modifier.size(40.dp))
+            }
         }
-    ) { padding ->
-        Box(modifier = Modifier.fillMaxSize().padding(padding).background(Color.White)) {
+
+
+        // --- CONTENT AREA ---
+        Box(modifier = Modifier.fillMaxSize()) {
             if (historyList.isEmpty()) {
-                // TAMPILAN EMPTY STATE
                 EmptyHistoryContent()
             } else {
-                // TAMPILAN DAFTAR HISTORY
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp)
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(top = 16.dp, bottom = 30.dp)
                 ) {
-                    // Menggunakan itemsIndexed agar kita tahu nomor index data yang diklik
                     itemsIndexed(historyList) { index, historyItem ->
                         HistoryGroupSection(
                             date = historyItem.date,
                             details = historyItem.details,
-                            onClick = { onNavigateToDetail(index) } // Klik ke detail
+                            onClick = { onNavigateToDetail(index) }
                         )
                     }
                 }
             }
         }
+    }
 
-        if (showDeleteDialog) {
-            ClearHistoryDialog(
-                onDismiss = { showDeleteDialog = false },
-                onClearAll = {
-                    viewModel.clearAllHistory()
-                    showDeleteDialog = false
-                }
-            )
-        }
+    // Dialog tetap bisa dipanggil di luar Column karena bersifat Overlay
+    if (showDeleteDialog) {
+        ClearHistoryDialog(
+            onDismiss = { showDeleteDialog = false },
+            onClearAll = {
+                viewModel.clearAllHistory()
+                showDeleteDialog = false
+            }
+        )
     }
 }
 
 @Composable
 fun HistoryGroupSection(date: String, details: List<String>, onClick: () -> Unit) {
-    Column(modifier = Modifier.padding(vertical = 12.dp).clickable { onClick() }) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            // Ubah padding vertical menjadi hanya bottom agar tidak menumpuk di atas
+            .padding(bottom = 20.dp, top = 10.dp)
+            .clickable { onClick() }
+    ) {
         Text(
             text = date,
-            fontSize = 11.sp,
+            fontSize = 12.sp,
             color = Color.Gray,
-            modifier = Modifier.padding(bottom = 8.dp),
+            modifier = Modifier.padding(bottom = 8.dp, start = 4.dp),
             fontFamily = MyCustomFontFamily
         )
 
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            border = BorderStroke(1.dp, Color(0xFFF0F0F0)),
+            shape = RoundedCornerShape(20.dp),
+            border = BorderStroke(1.dp, Color(0xFFE0E0E0)),
             color = Color.White
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.AutoAwesome, null, modifier = Modifier.size(14.dp), tint = Color(0xFFD81B60))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Your matches from:", fontWeight = FontWeight.Bold, fontSize = 12.sp, fontFamily = MyCustomFontFamily)
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = Color(0xFFFFB800)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        "Match found from:",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = Color.Black,
+                        fontFamily = MyCustomFontFamily
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 details.forEach { info ->
-                    Text(info, fontSize = 11.sp, color = Color.DarkGray, modifier = Modifier.padding(vertical = 2.dp))
+                    Text(
+                        text = "• $info",
+                        fontSize = 12.sp,
+                        color = Color.DarkGray,
+                        fontFamily = MyCustomFontFamily,
+                        modifier = Modifier.padding(vertical = 1.dp)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = "View more >",
+
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.End,
-                    fontSize = 10.sp,
-                    color = Color.Gray,
-                    fontFamily = MyCustomFontFamily
-                )
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "View details",
+                        fontSize = 11.sp,
+                        color = Color.Gray,
+                        fontFamily = MyCustomFontFamily
+                    )
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = Color.Gray
+                    )
+                }
             }
         }
     }
@@ -136,28 +208,33 @@ fun EmptyHistoryContent() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // --- BAGIAN GAMBAR ---
-        // Ganti R.drawable.history_empty dengan nama file gambarmu (misal: R.drawable.img_no_history)
         Image(
             painter = painterResource(id = R.drawable.history_empty),
-            contentDescription = "No History",
-            modifier = Modifier.size(180.dp) // Ukuran bisa kamu sesuaikan
+            contentDescription = null,
+            modifier = Modifier.size(200.dp)
         )
-
-        Spacer(modifier = Modifier.height(24.dp))
-        Text("No History Yet", fontWeight = FontWeight.Bold, fontSize = 20.sp, fontFamily = MyCustomFontFamily)
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(32.dp))
+        Text(
+            "No History Yet",
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            fontSize = 20.sp,
+            fontFamily = MyCustomFontFamily
+        )
+        Spacer(modifier = Modifier.height(12.dp))
         Text(
             "No history saved yet.\nYour match history will show up here!",
             textAlign = TextAlign.Center,
-            fontSize = 13.sp,
+            fontSize = 15.sp,
             color = Color.Gray,
             modifier = Modifier.padding(horizontal = 40.dp),
-            fontFamily = MyCustomFontFamily
+            fontFamily = MyCustomFontFamily,
+            lineHeight = 20.sp
         )
     }
 }
 
+// Dialog tetap menggunakan Surface dengan warna Putih eksplisit
 @Composable
 fun ClearHistoryDialog(onDismiss: () -> Unit, onClearAll: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
@@ -170,7 +247,7 @@ fun ClearHistoryDialog(onDismiss: () -> Unit, onClearAll: () -> Unit) {
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Clear History?", fontWeight = FontWeight.Bold, fontSize = 20.sp, fontFamily = MyCustomFontFamily)
+                Text("Clear History?", fontWeight = FontWeight.Bold, color = Color.Black, fontSize = 20.sp, fontFamily = MyCustomFontFamily)
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     "Are you sure you want to clear your match history?",
@@ -187,7 +264,7 @@ fun ClearHistoryDialog(onDismiss: () -> Unit, onClearAll: () -> Unit) {
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE8EAF6)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("Cancel", color = Color(0xFF5C6BC0), fontWeight = FontWeight.Bold)
+                        Text("Cancel",  fontFamily = MyCustomFontFamily, color = Color.Black, fontWeight = FontWeight.Bold)
                     }
                     Spacer(modifier = Modifier.width(12.dp))
                     Button(
@@ -196,7 +273,7 @@ fun ClearHistoryDialog(onDismiss: () -> Unit, onClearAll: () -> Unit) {
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD1E3)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("Clear all", color = Color.Black, fontWeight = FontWeight.Bold)
+                        Text("Clear all", color = Color.Black,  fontFamily = MyCustomFontFamily, fontWeight = FontWeight.Bold)
                     }
                 }
             }

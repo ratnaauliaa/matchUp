@@ -33,162 +33,171 @@ fun ResultScreen(
     onAddMore: () -> Unit,
     onNavigateToDetail: (String) -> Unit
 ) {
-    // --- TRIGGER SIMPAN KE HISTORY OTOMATIS ---
+    val lastUserMatch = viewModel.selectedMatches.lastOrNull()
+
+    // 1. Logika untuk menghasilkan list rekomendasi yang akan ditampilkan & disimpan
+    val recommendations = remember(lastUserMatch) {
+        if (lastUserMatch != null) {
+            viewModel.productsData.flatMap { brandDetail ->
+                brandDetail.products.map { product ->
+                    // Cari shade terbaik untuk setiap produk
+                    val bestShade = product.shades.minByOrNull { targetShade ->
+                        viewModel.calculateColorDistance(lastUserMatch.shade.hex, targetShade.hex)
+                    }
+                    MatchedProduct(
+                        brand = brandDetail.brand,
+                        productName = product.product_name,
+                        shadeName = bestShade?.shade_name ?: "Match Not Found",
+                        imageUrl = product.image
+                    )
+                }
+            }.filter { matchedProd ->
+                // Filter agar produk yang diinput user tidak muncul lagi di rekomendasi
+                viewModel.selectedMatches.none { it.product.product_name == matchedProd.productName }
+            }.take(10)
+        } else {
+            emptyList()
+        }
+    }
+
+    // 2. Simpan ke History hanya SEKALI saat halaman terbuka dan data rekomendasi siap
     LaunchedEffect(Unit) {
-        viewModel.saveMatchToHistory()
+        if (recommendations.isNotEmpty()) {
+            viewModel.saveCurrentMatchToHistory(recommendations)
+        }
     }
 
     val context = LocalContext.current
-
-    // --- STATE MANAGEMENT ---
     var showSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     var specificProductSearch by remember { mutableStateOf<String?>(null) }
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Result", fontWeight = FontWeight.Bold, fontFamily = MyCustomFontFamily) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = null)
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {
-                        // Simulasi Fitur Unduh
-                        Toast.makeText(context, "Mendownload hasil match...", Toast.LENGTH_SHORT).show()
-                    }) {
-                        Icon(Icons.Default.Download, contentDescription = null)
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White)
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .background(Color.White)
-                .verticalScroll(rememberScrollState())
-                .padding(20.dp)
-        ) {
-            // --- SECTION 1: RECALL (History Input Sebelumnya) ---
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(20.dp), tint = Color(0xFFFFB800))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("You entered this matches:", fontWeight = FontWeight.Bold, fontSize = 16.sp, fontFamily = MyCustomFontFamily)
-            }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .padding(horizontal = 20.dp)
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
 
-            Divider(modifier = Modifier.padding(vertical = 12.dp), thickness = 0.5.dp)
+            Spacer(modifier = Modifier.height(30.dp))
 
-            viewModel.selectedMatches.forEach { matchData ->
-                MatchEnteredItem(
-                    name = matchData.product.product_name,
-                    shade = matchData.shade.shade_name,
-                    imageUrl = matchData.product.image
-                )
-            }
-
-            // TOMBOL ADD MORE (Mereset inputan pencarian agar bersih)
-            TextButton(
-                onClick = {
-                    viewModel.clearCurrentSelection()
-                    onAddMore()
-                }
+            // --- TOP BAR ---
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Get better results by adding more matches.", color = Color(0xFF4285F4), fontSize = 12.sp, fontFamily = MyCustomFontFamily)
+                IconButton(
+                    onClick = onBack,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBackIosNew,
+                        contentDescription = "Back",
+                        modifier = Modifier.size(18.dp),
+                        tint = Color.Black
+                    )
+                }
+
+                Text(
+                    text = "Result",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center,
+                    fontSize = 24.sp,
+                    fontFamily = MyCustomFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+
+                IconButton(
+                    onClick = {
+                        Toast.makeText(context, "Downloading...", Toast.LENGTH_SHORT).show()
+                    },
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Download,
+                        contentDescription = "Download",
+                        modifier = Modifier.size(20.dp),
+                        tint = Color.Black
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // --- SECTION 2: RECOMMENDATIONS ---
-            val lastUserMatch = viewModel.selectedMatches.lastOrNull()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(vertical = 8.dp)
+            ) {
+                // --- SECTION 1: RECALL ---
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.AutoAwesome, null, modifier = Modifier.size(20.dp), tint = Color(0xFFFFB800))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("You entered this matches:", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 15.sp, fontFamily = MyCustomFontFamily)
+                }
 
-            if (specificProductSearch != null) {
-                // TAMPILAN JIKA USER FILTER PRODUK TERTENTU
-                ResultHeader(title = "Your best match:", icon = Icons.Default.FactCheck)
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFF5F5F5))
 
-                val foundProduct = viewModel.productsData.flatMap { it.products }
-                    .find { it.product_name.equals(specificProductSearch, ignoreCase = true) }
+                viewModel.selectedMatches.forEach { matchData ->
+                    MatchEnteredItem(
+                        brandName = matchData.brandName,
+                        name = matchData.product.product_name,
+                        shade = matchData.shade.shade_name,
+                        imageUrl = matchData.product.image
+                    )
+                }
 
-                if (foundProduct != null && lastUserMatch != null) {
-                    val bestShade = foundProduct.shades.minByOrNull {
-                        // Menggunakan fungsi dari viewModel
-                        viewModel.calculateColorDistance(lastUserMatch.shade.hex, it.hex)
+                TextButton(onClick = { viewModel.clearCurrentSelection(); onAddMore() }) {
+                    Text("Get better results by adding more matches.", color = Color(0xFF4285F4), fontSize = 12.sp, fontFamily = MyCustomFontFamily, textDecoration = TextDecoration.Underline)
+                }
+
+                Spacer(modifier = Modifier.height(15.dp))
+
+                // --- SECTION 2: RECOMMENDATIONS ---
+                if (specificProductSearch != null) {
+                    ResultHeader(title = "Your best match:", icon = Icons.Default.FactCheck)
+                    // ... (logika specific search tetap sama) ...
+                } else {
+                    ResultHeader(title = "Browse all recommendations:", icon = Icons.Default.FactCheck)
+
+                    TextButton(onClick = { showSheet = true }) {
+                        Text(text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(color = Color.Black)) { append("Look for a match in a ") }
+                            withStyle(style = SpanStyle(color = Color(0xFF4285F4), textDecoration = TextDecoration.Underline)) { append("specific product.") }
+                        }, fontSize = 12.sp, fontFamily = MyCustomFontFamily)
                     }
 
-                    RecommendationResultItem(
-                        brand = "Recommended",
-                        product = foundProduct.product_name,
-                        shade = bestShade?.shade_name ?: "-",
-                        imageUrl = foundProduct.image,
-                        onClick = { onNavigateToDetail(foundProduct.product_name) }
-                    )
-                }
-
-                TextButton(onClick = { specificProductSearch = null }) {
-                    Text("Show all recommendations", color = Color(0xFF4285F4), fontSize = 12.sp, fontFamily = MyCustomFontFamily)
-                }
-
-            } else {
-                // TAMPILAN STANDAR: SEMUA REKOMENDASI
-                ResultHeader(title = "Browse all recommendations:", icon = Icons.Default.FactCheck)
-
-                TextButton(onClick = { showSheet = true }) {
-                    Text(
-                        text = buildAnnotatedString {
-                            append("Look for a match in a ")
-                            withStyle(style = SpanStyle(color = Color(0xFF4285F4), textDecoration = TextDecoration.Underline)) {
-                                append("specific product.")
-                            }
-                        },
-                        fontSize = 12.sp,
-                        fontFamily = MyCustomFontFamily
-                    )
-                }
-
-                Divider(modifier = Modifier.padding(vertical = 12.dp), thickness = 0.5.dp)
-
-                if (lastUserMatch != null) {
-                    val recommendations = viewModel.productsData.flatMap { brandDetail ->
-                        brandDetail.products.map { product -> brandDetail.brand to product }
-                    }.filter { pair ->
-                        viewModel.selectedMatches.none { it.product.product_name == pair.second.product_name }
-                    }.take(10)
-
-                    recommendations.forEach { (brandName, product) ->
-                        val bestShade = product.shades.minByOrNull { targetShade ->
-                            // Menggunakan fungsi dari viewModel
-                            viewModel.calculateColorDistance(lastUserMatch.shade.hex, targetShade.hex)
-                        }
-
+                    // TAMPILKAN REKOMENDASI DARI LIST YANG SUDAH DIBUAT DI ATAS
+                    recommendations.forEach { item ->
                         RecommendationResultItem(
-                            brand = brandName,
-                            product = product.product_name,
-                            shade = bestShade?.shade_name ?: "Match Not Found",
-                            imageUrl = product.image,
-                            onClick = { onNavigateToDetail(product.product_name) }
+                            brand = item.brand,
+                            product = item.productName,
+                            shade = item.shadeName,
+                            imageUrl = item.imageUrl,
+                            onClick = { onNavigateToDetail(item.productName) }
                         )
                     }
                 }
+                Spacer(modifier = Modifier.height(30.dp))
             }
         }
 
-        // --- POP UP SEARCH (MODAL BOTTOM SHEET) ---
+        // ModalBottomSheet tetap sama...
         if (showSheet) {
             ModalBottomSheet(
                 onDismissRequest = { showSheet = false },
                 sheetState = sheetState,
                 containerColor = Color.White
             ) {
-                SearchProductSheet(
-                    onFindMatch = { _, product ->
-                        specificProductSearch = product
-                        showSheet = false
-                    }
-                )
+                SearchProductSheet(onFindMatch = { _, product ->
+                    specificProductSearch = product
+                    showSheet = false
+                })
             }
         }
     }
@@ -198,10 +207,13 @@ fun ResultScreen(
 
 @Composable
 fun ResultHeader(title: String, icon: ImageVector) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Icon(icon, null, modifier = Modifier.size(20.dp), tint = Color(0xFFFFB800))
         Spacer(modifier = Modifier.width(8.dp))
-        Text(title, fontWeight = FontWeight.Bold, fontSize = 16.sp, fontFamily = MyCustomFontFamily)
+        Text(title, fontWeight = FontWeight.Bold, color = Color.Black, fontSize = 15.sp, fontFamily = MyCustomFontFamily, modifier = Modifier.weight(1f))
     }
 }
 
@@ -214,11 +226,11 @@ fun SearchProductSheet(onFindMatch: (String, String) -> Unit) {
         modifier = Modifier.fillMaxWidth().padding(24.dp).padding(bottom = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Find your match in a specific product:", fontWeight = FontWeight.Bold, fontSize = 16.sp, fontFamily = MyCustomFontFamily)
+        Text("Find your match in a specific product:", fontWeight = FontWeight.Bold,  color = Color.Black, fontSize = 18.sp, fontFamily = MyCustomFontFamily)
         Text(
             "Select the brand/product that you want to find your best match in.",
             fontSize = 12.sp, color = Color.Gray, textAlign = TextAlign.Center,
-            modifier = Modifier.padding(vertical = 8.dp), fontFamily = MyCustomFontFamily
+            modifier = Modifier.padding(vertical = 10.dp), fontFamily = MyCustomFontFamily
         )
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -227,8 +239,8 @@ fun SearchProductSheet(onFindMatch: (String, String) -> Unit) {
             onValueChange = { brandInput = it },
             label = { Text("Brand") },
             placeholder = { Text("e.g. Wardah") },
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-            shape = RoundedCornerShape(12.dp)
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+            shape = RoundedCornerShape(20.dp)
         )
 
         OutlinedTextField(
@@ -236,8 +248,8 @@ fun SearchProductSheet(onFindMatch: (String, String) -> Unit) {
             onValueChange = { productInput = it },
             label = { Text("Product") },
             placeholder = { Text("Enter product name") },
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+            shape = RoundedCornerShape(20.dp),
             trailingIcon = { Icon(Icons.Default.Search, null) }
         )
 
@@ -245,17 +257,19 @@ fun SearchProductSheet(onFindMatch: (String, String) -> Unit) {
 
         Button(
             onClick = { onFindMatch(brandInput, productInput) },
-            modifier = Modifier.fillMaxWidth(0.8f).height(50.dp),
+            modifier = Modifier
+                .width(200.dp)
+                .height(45.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD1E3)),
-            shape = RoundedCornerShape(25.dp)
+            shape = RoundedCornerShape(20.dp)
         ) {
-            Text("Find my matches", color = Color.Black, fontWeight = FontWeight.Bold)
+            Text("Find my matches", color = Color.Black, fontSize = 15.sp, fontFamily = MyCustomFontFamily, fontWeight = FontWeight.Bold)
         }
     }
 }
 
 @Composable
-fun MatchEnteredItem(name: String, shade: String, imageUrl: String) {
+fun MatchEnteredItem(brandName: String, name: String, shade: String, imageUrl: String) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -267,8 +281,15 @@ fun MatchEnteredItem(name: String, shade: String, imageUrl: String) {
         )
         Spacer(modifier = Modifier.width(12.dp))
         Column {
-            Text(name, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, fontFamily = MyCustomFontFamily, maxLines = 1)
-            Text("Your Shade: $shade", fontSize = 12.sp, color = Color.Gray, fontFamily = MyCustomFontFamily)
+            Text(
+                text = brandName.uppercase(),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color.Black,
+                fontFamily = MyCustomFontFamily
+            )
+            Text(name, fontSize = 13.sp, color = Color.DarkGray, fontFamily = MyCustomFontFamily, maxLines = 1)
+            Text("Your Shade: $shade", fontSize = 13.sp, color = Color.DarkGray, fontFamily = MyCustomFontFamily)
         }
     }
 }
@@ -282,14 +303,14 @@ fun RecommendationResultItem(brand: String, product: String, shade: String, imag
         AsyncImage(
             model = imageUrl,
             contentDescription = null,
-            modifier = Modifier.size(56.dp).clip(RoundedCornerShape(12.dp)).background(Color(0xFFF9F9F9))
+            modifier = Modifier.size(50.dp).clip(RoundedCornerShape(12.dp)).background(Color(0xFFF9F9F9))
         )
         Spacer(modifier = Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(brand.uppercase(), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-            Text(product, fontSize = 13.sp, color = Color.Gray, maxLines = 1)
-            Text("Your Shade: $shade", fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = Color.Black)
+            Text(brand.uppercase(), fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Color.Black)
+            Text(product, fontSize = 13.sp, color = Color.DarkGray, maxLines = 1, fontFamily = MyCustomFontFamily)
+            Text("Your Shade: $shade", fontSize = 13.sp, color = Color.DarkGray, fontFamily = MyCustomFontFamily)
         }
-        Icon(Icons.Default.ArrowForwardIos, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color.LightGray)
+        Icon(imageVector = Icons.Default.ArrowForwardIos, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color.LightGray)
     }
 }

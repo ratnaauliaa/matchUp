@@ -15,39 +15,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.matchUp.ui.theme.MyCustomFontFamily
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ProductDetailScreen(
     productName: String,
     viewModel: MatchViewModel,
     onBack: () -> Unit
 ) {
-    // 1. MENGAMBIL DATA PRODUK DARI DATABASE JSON
-    // Perbaikan: Cari BrandDetail dulu untuk mendapatkan nama brand-nya
-    val brandDetail = viewModel.productsData.find { brandDetail ->
-        brandDetail.products.any { it.product_name == productName }
+    // 1. Tambahkan pengecekan data di awal (Safety First)
+    val brandDetail = viewModel.productsData.find { brand ->
+        brand.products.any { it.product_name == productName }
     }
     val productData = brandDetail?.products?.find { it.product_name == productName }
 
-    // 2. MENCARI SHADE TERBAIK
     val lastMatch = viewModel.selectedMatches.lastOrNull()
+
+    // Perbaikan: Tambahkan default hex jika lastMatch null agar tidak error saat hitung distance
     val bestShade = productData?.shades?.minByOrNull { shade ->
-        viewModel.calculateColorDistance(
-            lastMatch?.shade?.hex ?: "#FFFFFF",
-            shade.hex
-        )
+        viewModel.calculateColorDistance(lastMatch?.shade?.hex ?: "#FFFFFF", shade.hex)
     }
 
     var selectedShadeName by remember { mutableStateOf("") }
+    var feedback by remember { mutableStateOf<Boolean?>(null) }
+
+    // Perbaikan: Gunakan derivedStateOf agar UI responsif saat klik "Love"
+    val isSaved by remember(viewModel.savedProducts.size) {
+        derivedStateOf { viewModel.savedProducts.any { it.product_name == productName } }
+    }
 
     LaunchedEffect(bestShade) {
         if (selectedShadeName.isEmpty()) {
@@ -55,225 +56,294 @@ fun ProductDetailScreen(
         }
     }
 
-    var feedback by remember { mutableStateOf<Boolean?>(null) }
-    val isSaved = viewModel.savedProducts.any { it.product_name == productName }
-
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Product Details", fontWeight = FontWeight.Bold, fontFamily = MyCustomFontFamily) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = null)
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {
-                        productData?.let { data ->
-
-                            val newItem = Product(
-                                id = data.product_name.hashCode(),
-                                brand = brandDetail?.brand ?: "",
-                                product_name = data.product_name,
-                                image = data.image,
-                                shades = data.shades,
-                                description = data.description ?: ""
-                            )
-                            viewModel.toggleSaveProduct(newItem)
-                        }
-                    }) {
-                        Icon(
-                            imageVector = if (isSaved) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = null,
-                            tint = if (isSaved) Color.Red else Color.Black
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White)
-            )
-        }
-    ) { padding ->
-        if (productData == null) {
-            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("Product not found", fontFamily = MyCustomFontFamily)
-            }
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .background(Color.White)
-                    .verticalScroll(rememberScrollState())
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+        // --- TOP BAR ---
+        Spacer(modifier = Modifier.height(30.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onBack,
+                modifier = Modifier.size(40.dp).border(BorderStroke(1.dp, Color(0xFFE0E0E0)), RoundedCornerShape(12.dp))
             ) {
-                // SECTION: HEADER & IMAGE
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Tampilkan Nama Brand di atas Nama Produk
-                    Text(
-                        text = brandDetail?.brand?.uppercase() ?: "",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Gray,
-                        fontFamily = MyCustomFontFamily
-                    )
-                    Text(
-                        text = productData.product_name,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF003366),
-                        fontFamily = MyCustomFontFamily,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    tint = Color.Black,
+                    contentDescription = "Back",
+                    modifier = Modifier.size(20.dp)
+                )
+            }
 
-                    AsyncImage(
-                        model = productData.image,
-                        contentDescription = null,
-                        modifier = Modifier.size(220.dp),
-                        contentScale = ContentScale.Fit
-                    )
-                }
+            Text(
+                text = "Product Details",
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center,
+                fontSize = 20.sp, // Sesuaikan ukuran agar tidak terlalu besar
+                color = Color.Black,
+                fontFamily = MyCustomFontFamily,
+                fontWeight = FontWeight.Bold
+            )
+            val isSaved = viewModel.isProductSaved(productData?.product_name ?: "")
 
-                Spacer(modifier = Modifier.height(32.dp))
-                Divider(thickness = 1.dp, color = Color(0xFFF0F0F0))
-
-                // SECTION: REKOMENDASI SHADE
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Text(
-                        text = "Your Perfect Match is ${bestShade?.shade_name ?: "-"}",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        fontFamily = MyCustomFontFamily
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Detail Row sekarang aman karena Shade sudah punya properti ini
-                    DetailRow(
-                        label = "Undertone",
-                        value = bestShade?.undertone ?: "Neutral",
-                        color = Color(0xFF8BC34A)
-                    )
-                    DetailRow(
-                        label = "Skintone",
-                        value = bestShade?.skintone ?: "Medium",
-                        color = Color(0xFFD2B48C)
-                    )
-                }
-
-                Divider(thickness = 1.dp, color = Color(0xFFF0F0F0))
-
-                // SECTION: AVAILABLE SHADES
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Text("Available in :", fontWeight = FontWeight.Bold, fontSize = 15.sp, fontFamily = MyCustomFontFamily)
-
-                    Text(
-                        text = buildAnnotatedString {
-                            append("Color: $selectedShadeName")
-                            if (selectedShadeName == bestShade?.shade_name) {
-                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50))) {
-                                    append(" → best match for you!")
-                                }
-                            }
-                        },
-                        fontSize = 13.sp,
-                        fontFamily = MyCustomFontFamily
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    FlowRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        productData.shades.forEach { shade ->
-                            val isRecommended = shade.shade_name == bestShade?.shade_name
-                            val isCurrentSelection = shade.shade_name == selectedShadeName
-
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
-                                    .background(Color(android.graphics.Color.parseColor(shade.hex)))
-                                    .border(
-                                        width = if (isCurrentSelection) 2.dp else if (isRecommended) 1.dp else 0.dp,
-                                        color = if (isCurrentSelection) Color.Black else if (isRecommended) Color.LightGray else Color.Transparent,
-                                        shape = CircleShape
-                                    )
-                                    .clickable { selectedShadeName = shade.shade_name }
-                            )
-                        }
-                    }
-
-                    // Deskripsi Produk
-                    if (productData.description.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Text("Description", fontWeight = FontWeight.Bold, fontFamily = MyCustomFontFamily)
-                        Text(
-                            text = productData.description,
-                            fontSize = 13.sp,
-                            color = Color.DarkGray,
-                            fontFamily = MyCustomFontFamily,
-                            lineHeight = 18.sp
-                        )
+            IconButton(
+                onClick = {
+                    productData?.let {
+                        // FIX: Tambahkan brandDetail?.brand sebagai parameter kedua
+                        viewModel.toggleSaveProduct(it, brandDetail?.brand ?: "Unknown Brand")
                     }
                 }
+            ) {
+                Icon(
+                    imageVector = if (isSaved) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = null,
+                    tint = if (isSaved) Color.Red else Color.Black
+                )
+            }
+        }
 
-                FeedbackSection(
-                    currentFeedback = feedback,
-                    onFeedbackClick = { feedback = it }
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Column(
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+        ) {
+            // 2. GAMBAR PRODUK
+            Box(
+                modifier = Modifier.fillMaxWidth().height(280.dp).padding(20.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                AsyncImage(
+                    model = productData?.image,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // 1. NAMA PRODUK
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = brandDetail?.brand ?: "Unknown Brand",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    fontFamily = MyCustomFontFamily,
+                    textAlign = TextAlign.Center
                 )
 
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = productData?.product_name ?: "Unknown Product",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    fontFamily = MyCustomFontFamily,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Spacer(modifier = Modifier.height(15.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFF5F5F5))
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // 3. DETAIL MATCH
+            Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+                Surface(
+                    color = Color(0xFFF9F9F9),
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Your Perfect Match is:",
+                                color = Color.Black,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                fontFamily = MyCustomFontFamily
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = bestShade?.shade_name ?: "Calculating...",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black,
+                                fontFamily = MyCustomFontFamily
+                            )
+                        }
+
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFEEEEEE))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            DetailItem(label = "Undertone", value = bestShade?.undertone ?: "-")
+                            Spacer(modifier = Modifier.width(60.dp))
+                            DetailItem(label = "Skintone", value = bestShade?.skintone ?: "-")
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text("Available Shades", fontWeight = FontWeight.Bold, color = Color.Black, fontSize = 16.sp, fontFamily = MyCustomFontFamily)
+                Text("Selected: $selectedShadeName", fontSize = 13.sp, color = Color.Gray, fontFamily = MyCustomFontFamily)
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // PERBAIKAN: Gunakan try-catch pada Color.parseColor agar tidak crash jika HEX salah
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    productData?.shades?.forEach { shade ->
+                        val isRecommended = shade.shade_name == bestShade?.shade_name
+                        val isCurrentSelection = shade.shade_name == selectedShadeName
+
+                        val shadeColor = try {
+                            Color(android.graphics.Color.parseColor(shade.hex))
+                        } catch (e: Exception) {
+                            Color.LightGray
+                        }
+
+                        Box(contentAlignment = Alignment.Center) {
+                            Box(
+                                modifier = Modifier
+                                    .size(30.dp).clip(CircleShape)
+                                    .background(shadeColor)
+                                    .border(if (isCurrentSelection) 1.dp else 0.dp, Color.Black, CircleShape)
+                                    .clickable { selectedShadeName = shade.shade_name }
+                            )
+                            if (isRecommended) {
+                                Icon(
+                                    imageVector = Icons.Default.Favorite,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(14.dp),
+                                    tint = Color.Red
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // PERBAIKAN: Cek null pada description agar String.length() tidak error
+                if (!productData?.description.isNullOrEmpty()) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFF5F5F5))
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text("Description", fontWeight = FontWeight.Bold, color = Color.Black, fontSize = 16.sp, fontFamily = MyCustomFontFamily)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = productData?.description ?: "",
+                        fontSize = 14.sp,
+                        color = Color.DarkGray,
+                        textAlign = TextAlign.Justify,
+                        fontFamily = MyCustomFontFamily,
+                        lineHeight = 20.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(30.dp))
+                FeedbackSection(currentFeedback = feedback, onFeedbackClick = { feedback = it })
                 Spacer(modifier = Modifier.height(40.dp))
             }
         }
     }
 }
 
-
 @Composable
-fun DetailRow(label: String, value: String, color: Color) {
-    Row(modifier = Modifier.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Box(modifier = Modifier.size(16.dp).clip(CircleShape).background(color))
-        Spacer(modifier = Modifier.width(12.dp))
-        Text("$label : ", fontSize = 14.sp, fontFamily = MyCustomFontFamily)
-        Text(value, fontSize = 14.sp, fontWeight = FontWeight.Bold, fontFamily = MyCustomFontFamily)
+fun DetailItem(label: String, value: String) {
+    Column {
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = Color.DarkGray,
+            fontFamily = MyCustomFontFamily
+        )
+        Text(
+            text = value,
+            fontSize = 15.sp,
+            color = Color.Black,
+            fontWeight = FontWeight.Bold,
+            fontFamily = MyCustomFontFamily
+        )
     }
 }
 
 @Composable
 fun FeedbackSection(currentFeedback: Boolean?, onFeedbackClick: (Boolean) -> Unit) {
-    Surface(
-        modifier = Modifier.padding(20.dp).fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        border = BorderStroke(1.dp, Color.LightGray),
-        color = Color.White
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp),
+        contentAlignment = Alignment.Center
     ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+        Surface(
+            modifier = Modifier
+                .width(250.dp)
+                .height(45.dp),
+            color = Color.White,
+            shape = RoundedCornerShape(20.dp),
+            border = BorderStroke(1.dp, Color(0xFFF0F0F0))
         ) {
-            Text("Tried it? Did it Match?", fontSize = 12.sp, fontWeight = FontWeight.Bold, fontFamily = MyCustomFontFamily)
-            Spacer(modifier = Modifier.width(16.dp))
-
-            IconButton(onClick = { onFeedbackClick(true) }) {
-                Icon(
-                    imageVector = if (currentFeedback == true) Icons.Default.ThumbUp else Icons.Outlined.ThumbUpOffAlt,
-                    contentDescription = null,
-                    tint = if (currentFeedback == true) Color(0xFF4CAF50) else Color.Gray
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Did this shade match you?",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.DarkGray,
+                    fontFamily = MyCustomFontFamily,
+                    modifier = Modifier.weight(1f)
                 )
-            }
 
-            IconButton(onClick = { onFeedbackClick(false) }) {
-                Icon(
-                    imageVector = if (currentFeedback == false) Icons.Default.ThumbDown else Icons.Outlined.ThumbDownOffAlt,
-                    contentDescription = null,
-                    tint = if (currentFeedback == false) Color.Red else Color.Gray
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(
+                        onClick = { onFeedbackClick(true) },
+                        modifier = Modifier.size(25.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (currentFeedback == true) Icons.Default.ThumbUp else Icons.Outlined.ThumbUpOffAlt,
+                            contentDescription = null,
+                            tint = if (currentFeedback == true) Color(0xFF4CAF50) else Color.Gray,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(2.dp))
+
+                    IconButton(
+                        onClick = { onFeedbackClick(false) },
+                        modifier = Modifier.size(25.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (currentFeedback == false) Icons.Default.ThumbDown else Icons.Outlined.ThumbDownOffAlt,
+                            contentDescription = null,
+                            tint = if (currentFeedback == false) Color.Red else Color.Gray,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
             }
         }
     }

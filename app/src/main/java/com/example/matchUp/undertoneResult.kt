@@ -1,22 +1,29 @@
 package com.example.matchUp
 
-import androidx.compose.foundation.background
+import android.content.Intent
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.matchUp.ui.theme.MyCustomFontFamily
 
-// --- Model Data (Sesuaikan dengan struktur JSON-mu) ---
+// --- Model Data  ---
 data class UndertoneResult(
     val undertone_id: String,
     val result_title: String,
@@ -33,147 +40,221 @@ data class Recommendations(
 
 @Composable
 fun UndertoneResultScreen(
-    resultData: UndertoneResult, // Data diambil dari database/JSON
+    resultData: UndertoneResult,
     onBackToHome: () -> Unit,
+    onStartMatchClick: () -> Unit
 ) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp)
     ) {
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // --- TITLE ---
-        Text(
-            text = "Test Result",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            fontFamily = MyCustomFontFamily,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
-
         Spacer(modifier = Modifier.height(30.dp))
-
-        // --- HASIL UNDERTONE (Contoh: WARM/COOL/NEUTRAL) ---
-        // Sesuai lingkaran di atas desain image_249905.png
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .background(Color(0xFFFFD1E3), RoundedCornerShape(60.dp))
-                .align(Alignment.CenterHorizontally),
-            contentAlignment = Alignment.Center
+        // --- TOP BAR ---
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            // Tombol Back Kotak Melengkung
+            IconButton(
+                onClick = onBackToHome,
+                modifier = Modifier
+                    .size(40.dp)
+                    .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(10.dp))
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.Black
+                )
+            }
+
             Text(
-                text = resultData.undertone_id.uppercase(),
+                text = "Test Result",
                 fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = MyCustomFontFamily,
+                color = Color.Black
+            )
+
+            // Tombol Share Fungsional
+            IconButton(onClick = {
+                val sendIntent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(
+                        Intent.EXTRA_TEXT,
+                        "I just found out my undertone is ${resultData.undertone_id.uppercase()}! ✨\nCheck yours on MatchUp App!"
+                    )
+                    type = "text/plain"
+                }
+                context.startActivity(Intent.createChooser(sendIntent, "Share via"))
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = "Share",
+                    tint = Color.Black,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()) // Scroll dipindah ke sini
+        ) {
+
+            // --- IMAGE BANNER ---
+            Image(
+                painter = painterResource(id = R.drawable.undertone_guide),
+                contentDescription = "Undertone Guide",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(250.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Fit
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            // --- RESULT TITLE WITH INDICATOR ---
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(18.dp)
+                        .background(
+                            color = if (resultData.undertone_id.lowercase() == "warm") Color(
+                                0xFFE9573F
+                            ) else Color(0xFF5D9CEC),
+                            shape = CircleShape
+                        )
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = "You have ${resultData.undertone_id.lowercase()} undertones!",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = MyCustomFontFamily,
+                    color = Color.Black
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = resultData.description,
+                fontSize = 15.sp,
+                color = Color.Gray,
+                fontFamily = MyCustomFontFamily,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                lineHeight = 22.sp
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 12.dp),
+                color = Color(0xFFF0F0F0),
+                thickness = 1.dp
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // --- RECOMMENDATION SECTION ---
+            Text(
+                text = "Perfect for you",
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
                 fontFamily = MyCustomFontFamily
             )
-        }
 
-        Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-        // --- SUBTITLE & DESCRIPTION ---
-        Text(
-            text = resultData.result_title,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            fontFamily = MyCustomFontFamily,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = resultData.description,
-            fontSize = 14.sp,
-            color = Color.Gray,
-            fontFamily = MyCustomFontFamily,
-            modifier = Modifier.padding(top = 8.dp),
-            textAlign = TextAlign.Center
-        )
 
-        Spacer(modifier = Modifier.height(30.dp))
-
-        // --- PERFECT FOR YOU SECTION ---
-        Text(
-            text = "Perfect for you",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            fontFamily = MyCustomFontFamily
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-
-        RecommendationItem("Foundations", resultData.recommendations.foundations)
-        RecommendationItem("Concealers", resultData.recommendations.concealers)
-        RecommendationItem("Blushes & Lipsticks", resultData.recommendations.lipsticks)
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // --- AVOID SECTION ---
-        Text(
-            text = "Avoid",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Red,
-            fontFamily = MyCustomFontFamily
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-
-        resultData.avoid.forEach { item ->
             Text(
-                text = "• $item",
-                fontSize = 14.sp,
-                color = Color.Gray,
+                text = resultData.recommendations.foundations,
+                fontSize = 13.sp,
+                color = Color.Black,
                 fontFamily = MyCustomFontFamily,
                 modifier = Modifier.padding(vertical = 2.dp)
             )
-        }
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        // --- BUTTON ---
-        Button(
-            onClick = onBackToHome,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-            shape = RoundedCornerShape(12.dp)
-        ) {
             Text(
-                text = "Find my shade",
-                fontSize = 16.sp,
-                color = Color.White,
+                text = resultData.recommendations.concealers,
+                fontSize = 13.sp,
+                color = Color.Black,
+                fontFamily = MyCustomFontFamily,
+                modifier = Modifier.padding(vertical = 2.dp)
+            )
+            Text(
+                text = resultData.recommendations.lipsticks,
+                fontSize = 13.sp,
+                color = Color.Black,
+                fontFamily = MyCustomFontFamily,
+                modifier = Modifier.padding(vertical = 2.dp)
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 12.dp),
+                color = Color(0xFFF0F0F0),
+                thickness = 1.dp
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+
+            // --- AVOID SECTION ---
+            Text(
+                text = "Avoid",
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
+                color = Color(0xFFD32F2F),
                 fontFamily = MyCustomFontFamily
             )
+            resultData.avoid.forEach { item ->
+                Text(
+                    text = "$item",
+                    fontSize = 13.sp,
+                    color = Color.Black,
+                    fontFamily = MyCustomFontFamily,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            // --- ACTION BUTTON ---
+            Button(
+                onClick = onStartMatchClick,
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(45.dp)
+                    .align(Alignment.CenterHorizontally),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD1E3)),
+                shape = RoundedCornerShape(20.dp)
+            ) {
+                Text(
+                    text = "Find my shade",
+                    fontSize = 15.sp,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = MyCustomFontFamily
+                )
+            }
+
+            Spacer(modifier = Modifier.height(30.dp))
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
-    }
-}
-
-@Composable
-fun RecommendationItem(title: String, description: String) {
-    Column(modifier = Modifier.padding(vertical = 6.dp)) {
-        Text(
-            text = title,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color.Black,
-            fontFamily = MyCustomFontFamily
-        )
-        Text(
-            text = description,
-            fontSize = 13.sp,
-            color = Color.DarkGray,
-            fontFamily = MyCustomFontFamily
-        )
     }
 }
