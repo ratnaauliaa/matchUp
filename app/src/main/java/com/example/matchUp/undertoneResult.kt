@@ -237,7 +237,7 @@ fun UndertoneResultScreen(
 
             // --- ACTION BUTTON ---
             Button(
-                onClick = onStartMatchClick,
+                onClick = onBackToHome,
                 modifier = Modifier
                     .width(200.dp)
                     .height(45.dp)
@@ -246,7 +246,7 @@ fun UndertoneResultScreen(
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Text(
-                    text = "Find my shade",
+                    text = "back to Home",
                     fontSize = 15.sp,
                     color = Color.Black,
                     fontWeight = FontWeight.Bold,
@@ -258,3 +258,4 @@ fun UndertoneResultScreen(
         }
     }
 }
+

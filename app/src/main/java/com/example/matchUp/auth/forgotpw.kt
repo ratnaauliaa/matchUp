@@ -89,7 +89,7 @@ fun ForgotPW(
                 modifier = Modifier.padding(top = 4.dp)
             )
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
             // Email Input
             CustomSmallTextField(
@@ -123,7 +123,7 @@ fun ForgotPW(
                 }
             }
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // Send Link Button
             Button(
@@ -142,6 +142,18 @@ fun ForgotPW(
                                     errorMessage = when {
                                         errorMsg.contains("no user", ignoreCase = true) ||
                                                 errorMsg.contains("user-not-found") -> "This email is not registered."
+                                        errorMsg.contains("invalid", ignoreCase = true) -> "Invalid email format."
+                                        errorMsg.contains("missing", ignoreCase = true) -> "Email is required!"
+                                        errorMsg.contains("email", ignoreCase = true) -> "Invalid email format!"
+                                        errorMsg.contains("network", ignoreCase = true) -> "Network error. Check your connection."
+                                        else -> "Failed to send reset link. Please try again."
+                                    }
+                                }
+                            }
+                            .addOnFailureListener { e ->
+                                isLoading = false
+                                e.localizedMessage?.let {
+                                    errorMessage = when {
                                         else -> "Failed: System busy."
                                     }
                                 }
@@ -168,14 +180,7 @@ fun ForgotPW(
             }
 
             Spacer(modifier = Modifier.height(20.dp))
-            Text(text = "Or continue with", fontFamily = MyCustomFontFamily, modifier = Modifier.align(Alignment.CenterHorizontally), fontSize = 12.sp, color = Color.Gray)
-            Spacer(modifier = Modifier.height(16.dp))
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                SocialCircleButton(imageResId = com.example.matchUp.R.drawable.google)
-                Spacer(modifier = Modifier.width(16.dp))
-                SocialCircleButton(imageResId = R.drawable.fb)
-            }
 
             Spacer(modifier = Modifier.height(30.dp))
 

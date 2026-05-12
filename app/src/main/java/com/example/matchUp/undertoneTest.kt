@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.example.matchUp.ui.theme.MyCustomFontFamily
 
 @Composable
@@ -36,6 +37,7 @@ fun UndertoneTestScreen(onBack: () -> Unit, onFinish: (String) -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .zIndex(1f)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -153,7 +155,7 @@ fun UndertoneTestScreen(onBack: () -> Unit, onFinish: (String) -> Unit) {
                 title = "Skintone",
                 desc = "Your natural skin color without makeup",
                 question = "How would you describe your skin tone?",
-                options = listOf("Fair", "Light", "Medium", "Olive", "Dark", "Deep"),
+                options = listOf("Fair", "Light", "Medium", "Dark", "Deep"),
                 onOptionSelected = {
                     val result = when {
                         warmScore > coolScore && warmScore > neutralScore -> "Warm"

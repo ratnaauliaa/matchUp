@@ -54,7 +54,7 @@ fun ResultScreen(
             }.filter { matchedProd ->
                 // Filter agar produk yang diinput user tidak muncul lagi di rekomendasi
                 viewModel.selectedMatches.none { it.product.product_name == matchedProd.productName }
-            }.take(10)
+            }.take(100)
         } else {
             emptyList()
         }

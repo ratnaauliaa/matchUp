@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,6 +58,7 @@ fun MainContent(
         onUndertoneClick = onUndertoneClick,
         isLoggedIn = isLoggedIn,
         onInsightClick = onInsightClick
+
     )
 }
 
@@ -207,19 +209,45 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(15.dp))
 
-        // --- RECOMMENDATION SECTION ---
-        SectionHeader(title = "Recommendation", onShowAllClick = {})
-        RecommendationItem(
-            brand = "Somethinc",
-            name = "Copy Paste Tinted Sunscreen",
-            imageRes = R.drawable.prod_smth
-        )
-        RecommendationItem(
-            brand = "Wardah",
-            name = "Lightening Liquid Foundation",
-            imageRes = R.drawable.prod_wardah
-        )
 
+        SectionHeader(title = "Recommendation for You", onShowAllClick = {})
+
+// Di dalam HomeScreen.kt
+
+// Jalankan filter HANYA saat finalUndertone berubah
+        // Di HomeScreen.kt
+
+// 1. Picu perhitungan rekomendasi HANYA saat undertone berubah
+        LaunchedEffect(viewModel.finalUndertone) {
+            viewModel.updateRecommendations(viewModel.finalUndertone)
+        }
+
+// 2. Ambil data dari state yang sudah dikunci di ViewModel
+        val recommendedProducts = viewModel.filteredRecommendations
+
+        if (recommendedProducts.isEmpty()) {
+            Text(
+                text = "Take the undertone test to see personalized recommendations!",
+                fontSize = 13.sp,
+                color = Color.Gray,
+                modifier = Modifier.padding(vertical = 10.dp)
+            )
+        } else {
+            Column {
+                recommendedProducts.forEach { (brandName, product, matchedShade) ->
+                    // Di HomeScreen.kt
+                    RecommendationItem(
+                        brand = brandName,
+                        name = "${product.product_name} (${matchedShade.shade_name})",
+                        imageUrl = product.image,
+                        onItemClick = {
+                            // Kirim nama produk dan nama shade yang cocok
+                            navController.navigate("product_detail/${product.product_name}|${matchedShade.shade_name}")
+                        }
+                    )
+                }
+            }
+        }
 
         // --- FOR YOU SECTION ---
         SectionHeader(
@@ -312,73 +340,26 @@ fun CategoryCard(
 }
 
 @Composable
-fun RecommendationItem(brand: String, name: String, imageRes: Int) {
+fun RecommendationItem(brand: String, name: String, imageUrl: String, onItemClick: () -> Unit) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 12.dp)
-            .clickable { },
+        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp).clickable { onItemClick() },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // 1. Gambar Produk
         AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(imageRes)
-                .crossfade(true)
-                .build(),
+            model = ImageRequest.Builder(LocalContext.current).data(imageUrl).crossfade(true).error(R.drawable.prod_smth).build(),
             contentDescription = name,
-            modifier = Modifier
-                .size(60.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.White),
+            modifier = Modifier.size(65.dp).clip(RoundedCornerShape(12.dp)).background(Color(0xFFF5F5F5)),
             contentScale = ContentScale.Crop
         )
-
         Spacer(modifier = Modifier.width(16.dp))
-
-        // 2. Kontainer Box untuk Teks & Detail
-        // Kita pakai Box agar bisa menaruh "Details" di pojok kanan bawah
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(60.dp) // Samakan dengan tinggi gambar agar sejajar
-        ) {
-            // Teks Brand & Nama di kiri atas
+        Box(modifier = Modifier.weight(1f).height(65.dp)) {
             Column(modifier = Modifier.align(Alignment.TopStart)) {
-                Text(
-                    text = brand,
-                    fontWeight = FontWeight.Medium,
-                    fontFamily = MyCustomFontFamily,
-                    fontSize = 15.sp,
-                    color = Color.Black
-                )
-                Text(
-                    text = name,
-                    color = Color.Gray,
-                    fontFamily = MyCustomFontFamily,
-                    fontSize = 13.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Text(text = brand, fontWeight = FontWeight.Bold, fontFamily = MyCustomFontFamily, fontSize = 14.sp, color = Color.Black)
+                Text(text = name, color = Color.Gray, fontFamily = MyCustomFontFamily, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-
-            // --- BAGIAN DETAILS DI POJOK KANAN BAWAH ---
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.align(Alignment.BottomEnd) // Kunci perubahannya di sini
-            ) {
-                Text(
-                    text = "Details",
-                    color = Color.Gray,
-                    fontSize = 12.sp,
-                    fontFamily = MyCustomFontFamily
-                )
-                Icon(
-                    imageVector = Icons.Default.ChevronRight,
-                    contentDescription = null,
-                    modifier = Modifier.size(12.dp),
-                    tint = Color.Gray
-                )
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.align(Alignment.BottomEnd)) {
+                Text(text = "Details", color = Color.Gray, fontSize = 11.sp)
+                Icon(Icons.Default.ChevronRight, null, Modifier.size(14.dp), tint = Color.Gray)
             }
         }
     }

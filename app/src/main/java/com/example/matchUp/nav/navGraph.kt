@@ -25,17 +25,24 @@ fun SetupNavGraph(
         startDestination = "splash",
         modifier = Modifier.padding(paddingValues)
     ) {
-        // --- 1-5: Auth & Intro ---
+        // --- 1. AUTH & INTRO ---
         composable("splash") {
             SplashScreen(onTimeout = {
-                navController.navigate("onboarding") { popUpTo("splash") { inclusive = true } }
+                navController.navigate("onboarding") {
+                    popUpTo("splash") { inclusive = true }
+                }
             })
         }
+
         composable("onboarding") {
             OnboardingScreen(onFinished = {
-                navController.navigate("home") { popUpTo("onboarding") { inclusive = true } }
+                navController.navigate("login") {
+                    // Ini benar, agar dari login tidak bisa balik ke onboarding saat baru buka aplikasi
+                    popUpTo("onboarding") { inclusive = true }
+                }
             })
         }
+
         composable("login") {
             LoginScreen(
                 onLoginSuccess = { email ->
@@ -44,14 +51,14 @@ fun SetupNavGraph(
                     matchViewModel.userEmail = email
                     matchViewModel.isLoggedIn = true
 
-                    navController.navigate("home") {
+                    // Ubah rute ke "undertone_test" agar sinkron dengan NavHost kamu
+                    navController.navigate("undertone_test") {
+                        // Hapus halaman login dari stack agar user tidak bisa back ke login
                         popUpTo("login") { inclusive = true }
                     }
                 },
                 onBack = {
-                    navController.navigate("home") {
-                        popUpTo("login") { inclusive = true }
-                    }
+                    navController.popBackStack()
                 },
                 onForgotPassword = { navController.navigate("forgot_password") },
                 onRegisterClick = { navController.navigate("register") }
@@ -63,9 +70,14 @@ fun SetupNavGraph(
                 viewModel = matchViewModel,
                 onBack = { navController.popBackStack() },
                 onSignInClick = { navController.popBackStack() },
-                onRegisterSuccess = { navController.navigate("login") { popUpTo("register") { inclusive = true } } }
+                onRegisterSuccess = {
+                    navController.navigate("login") {
+                        popUpTo("register") { inclusive = true }
+                    }
+                }
             )
         }
+
         composable("forgot_password") {
             ForgotPW(
                 onBack = { navController.popBackStack() },
@@ -74,7 +86,7 @@ fun SetupNavGraph(
             )
         }
 
-        // --- 6: Home ---
+        // --- 2. HOME ---
         composable("home") {
             MainContent(
                 viewModel = matchViewModel,
@@ -82,18 +94,14 @@ fun SetupNavGraph(
                 userName = matchViewModel.userName,
                 isLoggedIn = matchViewModel.isLoggedIn,
                 onProfileClick = {
-                    // Jika mau Profile juga dikunci:
                     if (matchViewModel.isLoggedIn) {
-                      
+                        navController.navigate("profile")
                     } else {
                         navController.navigate("login")
                     }
                 },
-                onNotificationsClick = {
-                    navController.navigate("notifications")
-                },
+                onNotificationsClick = { navController.navigate("notifications") },
                 onStartMatchClick = {
-                    // CEK LOGIN SEBELUM SCAN
                     if (matchViewModel.isLoggedIn) {
                         navController.navigate("match_step1")
                     } else {
@@ -101,21 +109,18 @@ fun SetupNavGraph(
                     }
                 },
                 onUndertoneClick = {
-                    // CEK LOGIN SEBELUM TEST UNDERTONE
                     if (matchViewModel.isLoggedIn) {
                         navController.navigate("undertone_test")
                     } else {
                         navController.navigate("login")
                     }
                 },
-                onInsightClick = {
-                    navController.navigate("insights")
-                }
+                onInsightClick = { navController.navigate("insights") }
             )
         }
 
-        // --- ALUR MATCHUP ---
-        composable(route = "match_step1") {
+        // --- 3. ALUR MATCHUP (FOUNDATION MATCHING) ---
+        composable("match_step1") {
             BrandSelectionScreen(
                 matchViewModel = matchViewModel,
                 brandListFromDb = matchViewModel.allBrandList,
@@ -130,14 +135,12 @@ fun SetupNavGraph(
         composable("match_step2") {
             val brand = matchViewModel.selectedBrandName
             if (brand.isEmpty()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate("match_step1") { popUpTo("match_step1") { inclusive = true } }
-                }
+                // Safety check: jika brand kosong (backstack issue), balik ke step 1
+                LaunchedEffect(Unit) { navController.popBackStack("match_step1", false) }
             } else {
-                val products = matchViewModel.getProductsByBrand(brand)
                 ProductSelectionScreen(
                     selectedBrandName = brand,
-                    productListFromDb = products,
+                    productListFromDb = matchViewModel.getProductsByBrand(brand),
                     onBack = { navController.popBackStack() },
                     onNext = { product ->
                         matchViewModel.selectedProduct = product
@@ -159,14 +162,10 @@ fun SetupNavGraph(
                             popUpTo("match_step1") { inclusive = true }
                         }
                     },
-                    onFindMatches = {
-                        navController.navigate("match_result")
-                    }
+                    onFindMatches = { navController.navigate("match_result") }
                 )
             } else {
-                LaunchedEffect(Unit) {
-                    navController.navigate("match_step1") { popUpTo("match_home") { inclusive = false } }
-                }
+                LaunchedEffect(Unit) { navController.popBackStack("match_step1", false) }
             }
         }
 
@@ -178,11 +177,36 @@ fun SetupNavGraph(
                         popUpTo("home") { inclusive = true }
                     }
                 },
-                onAddMore = {
-                    navController.navigate("match_step1")
-                },
+                onAddMore = { navController.navigate("match_step1") },
                 onNavigateToDetail = { productName ->
                     navController.navigate("product_detail/$productName")
+                }
+            )
+        }
+
+        // --- 4. DETAILS & FEATURES ---
+        composable("product_detail/{productPath}") { backStackEntry ->
+            val productPath = backStackEntry.arguments?.getString("productPath") ?: ""
+
+            // Pisahkan nama produk dan nama shade
+            val parts = productPath.split("|")
+            val pName = parts[0]
+            val sName = if (parts.size > 1) parts[1] else null
+
+            ProductDetailScreen(
+                productName = pName,
+                initialShadeName = sName, // Kirim ke Screen
+                viewModel = matchViewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+
+        composable("insights") {
+            InsightsScreen(
+                viewModel = matchViewModel,
+                onNavigateToDetail = { articleId ->
+                    navController.navigate("article_detail/$articleId")
                 }
             )
         }
@@ -195,31 +219,6 @@ fun SetupNavGraph(
         }
 
 
-        composable("product_detail/{productName}") { backStackEntry ->
-            val productName = backStackEntry.arguments?.getString("productName") ?: ""
-            ProductDetailScreen(
-                productName = productName,
-                viewModel = matchViewModel,
-                onBack = { navController.popBackStack() }
-            )
-        }
-
-        composable("notifications") {
-            NotificationScreen(onBack = { navController.popBackStack() })
-        }
-
-        // --- INSIGHTS ---
-        composable("insights") {
-            InsightsScreen(
-                viewModel = matchViewModel,
-                onNavigateToDetail = { articleId ->
-                    navController.navigate("article_detail/$articleId")
-                }
-            )
-        }
-
-
-        // --- HISTORY ---
         composable("history") {
             HistoryScreen(
                 viewModel = matchViewModel,
@@ -230,81 +229,81 @@ fun SetupNavGraph(
             )
         }
 
-        composable("history_detail/{index}") { backStackEntry ->
-            val index = backStackEntry.arguments?.getString("index")?.toIntOrNull()
-            if (index != null) {
-                HistoryDetailScreen(
-                    viewModel = matchViewModel,
-                    historyIndex = index,
-                    onBack = { navController.popBackStack() },
-                    onNavigateToProductDetail = { productName ->
-                        navController.navigate("product_detail/$productName")
-                    }
-                )
-            }
-        }
-
-        // --- PROFILE ---
         composable("profile") {
             ProfileScreen(
                 viewModel = matchViewModel,
                 onLogout = {
-                    // 1. Reset status login dan data user di ViewModel
                     matchViewModel.isLoggedIn = false
                     matchViewModel.updateUserName("Guest")
 
-                    // 2. Bersihkan semua history dan pindah ke Login
+                    // 1. Arahkan ke Onboarding dulu (tapi jangan tampilkan, cuma buat naruh di stack)
+                    navController.navigate("onboarding") {
+                        popUpTo(0) { inclusive = true } // Bersihkan total
+                    }
+
+                    // 2. Baru tumpuk dengan Login
                     navController.navigate("login") {
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
-                        }
+                        // Jangan pakai popUpTo di sini agar "onboarding" tetap ada di bawah "login"
                         launchSingleTop = true
                     }
                 },
-                onNavigateToHistory = { navController.navigate("history") },
-                onNavigateToEditProfile = { /* ... */ }
+                onNavigateToHistory = {
+                    navController.navigate("history")
+                },
+                onNavigateToEditProfile = { }
             )
         }
 
-        // --- 7: UNDERTONE FEATURE ---
+        // --- 5. UNDERTONE FEATURE ---
         composable("undertone_test") {
             UndertoneTestScreen(
-                onBack = { navController.popBackStack() },
+                onBack = {
+                    // Jika ingin memastikan kembali ke Home dengan bersih:
+                    navController.navigate("home") {
+                        popUpTo("home") { inclusive = true }
+                    }
+                },
                 onFinish = { result ->
                     matchViewModel.finalUndertone = result
-                    navController.navigate("undertone_result")
+
+                    // PENTING: Hapus rekomendasi lama supaya aplikasi mau mengacak ulang untuk undertone baru
+                    matchViewModel.resetRecommendations()
+
+                    navController.navigate("undertone_result") {
+                        // Menghapus halaman test dari history agar tidak bisa di-back dari halaman result
+                        popUpTo("undertone_test") { inclusive = true }
+                    }
                 }
             )
         }
 
+        // Di dalam SetupNavGraph -> navGraph.kt
         composable("undertone_result") {
             val context = LocalContext.current
+            LaunchedEffect(Unit) {
+                matchViewModel.loadUndertoneResultsFromJson(context)
+            }
 
-            // 1. Ambil data dari ViewModel
-            val allResults = matchViewModel.loadUndertoneResultsFromJson(context)
-            val userResult = matchViewModel.finalUndertone // Misal: "warm"
-
-            // 2. Cari data yang cocok
-            val resultData = allResults.find { it.undertone_id == userResult.lowercase() }
+            val userResult = matchViewModel.finalUndertone
+            val resultData = matchViewModel.undertoneResults.find {
+                it.undertone_id.equals(userResult, ignoreCase = true)
+            }
 
             if (resultData != null) {
                 UndertoneResultScreen(
                     resultData = resultData,
                     onBackToHome = {
-                        // Navigasi balik ke Home dan bersihkan backstack
                         navController.navigate("home") {
-                            popUpTo("home") { inclusive = true }
+                            popUpTo("splash") { inclusive = false }
+                            launchSingleTop = true
                         }
                     },
                     onStartMatchClick = {
                         navController.navigate("match_step1")
                     }
+                    // HAPUS viewModel dan onNavigateToDetail dari sini
+                    // karena di file undertoneResult.kt kamu tidak ada parameter itu
                 )
-            } else {
-                // Jika data tidak ditemukan, balik ke home
-                LaunchedEffect(Unit) {
-                    navController.navigate("home")
-                }
             }
         }
     }

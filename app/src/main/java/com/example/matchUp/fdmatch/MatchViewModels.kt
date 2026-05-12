@@ -74,6 +74,7 @@ class MatchViewModel : ViewModel() {
 
     // --- USER PROFILE STATE ---
 
+
     var isLoggedIn by mutableStateOf(false)
     var userName by mutableStateOf("Guest")
     var userEmail by mutableStateOf("")
@@ -102,6 +103,9 @@ class MatchViewModel : ViewModel() {
     var coolScore by mutableStateOf(0)
     var neutralScore by mutableStateOf(0)
     var finalUndertone by mutableStateOf("")
+    var undertoneResults by mutableStateOf<List<UndertoneResult>>(listOf())
+    var filteredRecommendations by mutableStateOf<List<Triple<String, Product, Shade>>>(emptyList())
+    var personalizedRecommendations = mutableStateListOf<Pair<String, Product>>()
 
     // 1. Wishlist Logic
     // Di MatchViewModel.kt
@@ -229,16 +233,56 @@ class MatchViewModel : ViewModel() {
         }
     }
 
-    fun loadUndertoneResultsFromJson(context: Context): List<UndertoneResult> {
-        return try {
+    fun loadUndertoneResultsFromJson(context: Context) {
+        try {
             val jsonString = context.assets.open("undertone_data.json").bufferedReader().use { it.readText() }
             val dataWrapper: UndertoneDataWrapper = Gson().fromJson(jsonString, object : TypeToken<UndertoneDataWrapper>() {}.type)
-            Log.d("MatchVM", "✅ Undertone Data Loaded Successfully")
-            dataWrapper.undertone_results
+
+            // Save to state so it can be accessed by NavGraph or Screens
+            undertoneResults = dataWrapper.undertone_results
+
+            Log.d("MatchVM", "Successfully loaded undertone data from JSON")
         } catch (e: Exception) {
-            Log.e("MatchVM", "❌ Error: ${e.message}")
-            emptyList()
+            Log.e("MatchVM", "Failed to load undertone JSON: ${e.message}")
         }
+    }
+
+// Di dalam MatchViewModel.kt
+
+    // 1. Tambahkan variabel ini untuk menyimpan hasil yang sudah "dikunci"
+
+    fun updateRecommendations(userUndertone: String) {
+        // Jika data sudah ada, jangan acak ulang (ini kunci agar tidak ngerandom terus)
+        if (filteredRecommendations.isNotEmpty() && userUndertone.isNotEmpty()) return
+
+        if (userUndertone.isEmpty()) {
+            filteredRecommendations = emptyList()
+            return
+        }
+
+        val recommendedList = mutableListOf<Triple<String, Product, Shade>>()
+
+        productsData.forEach { brandObj ->
+            brandObj.products.forEach { product ->
+                // Cari shade yang COCOK PERSIS dengan undertone
+                val matchingShade = product.shades.find {
+                    it.undertone.trim().equals(userUndertone.trim(), ignoreCase = true)
+                }
+
+                if (matchingShade != null) {
+                    recommendedList.add(Triple(brandObj.brand, product, matchingShade))
+                }
+            }
+        }
+
+        // Shuffled HANYA dilakukan sekali di sini, lalu disimpan ke state
+        filteredRecommendations = recommendedList.shuffled().take(5)
+    }
+
+    // Tambahkan fungsi ini untuk dipanggil saat user TEST ULANG
+    fun resetRecommendations() {
+        filteredRecommendations = emptyList()
+        Log.d("MatchVM", "Recommendations has been reset for new test")
     }
 
     fun getProductsByBrand(brandName: String): List<Product> {
@@ -250,7 +294,9 @@ class MatchViewModel : ViewModel() {
         return try {
             val h1 = hexToRgb(hex1)
             val h2 = hexToRgb(hex2)
-            sqrt((h2.r - h1.r).toDouble().pow(2) + (h2.g - h1.g).toDouble().pow(2) + (h2.b - h1.b).toDouble().pow(2))
+            sqrt((h2.r - h1.r).toDouble().pow(2) +
+                    (h2.g - h1.g).toDouble().pow(2) +
+                    (h2.b - h1.b).toDouble().pow(2))
         } catch (e: Exception) {
             Double.MAX_VALUE
         }

@@ -26,6 +26,7 @@ import com.example.matchUp.ui.theme.MyCustomFontFamily
 @Composable
 fun ProductDetailScreen(
     productName: String,
+    initialShadeName: String? = null,
     viewModel: MatchViewModel,
     onBack: () -> Unit
 ) {
@@ -42,7 +43,19 @@ fun ProductDetailScreen(
         viewModel.calculateColorDistance(lastMatch?.shade?.hex ?: "#FFFFFF", shade.hex)
     }
 
-    var selectedShadeName by remember { mutableStateOf("") }
+    // Ganti state ini
+    var selectedShadeName by remember { mutableStateOf(initialShadeName ?: "") }
+
+    // Update logika LaunchedEffect agar lebih pintar
+    LaunchedEffect(productData, bestShade) {
+        if (selectedShadeName.isEmpty()) {
+            // Jika tidak ada initialShadeName, baru gunakan hasil hitungan bestShade
+            selectedShadeName = bestShade?.shade_name ?: ""
+        }
+    }
+
+    // Cari data shade yang sedang dipilih (untuk ditampilkan di Undertone/Skintone detail)
+    val currentDisplayShade = productData?.shades?.find { it.shade_name == selectedShadeName } ?: bestShade
     var feedback by remember { mutableStateOf<Boolean?>(null) }
 
     // Perbaikan: Gunakan derivedStateOf agar UI responsif saat klik "Love"
@@ -50,11 +63,7 @@ fun ProductDetailScreen(
         derivedStateOf { viewModel.savedProducts.any { it.product_name == productName } }
     }
 
-    LaunchedEffect(bestShade) {
-        if (selectedShadeName.isEmpty()) {
-            selectedShadeName = bestShade?.shade_name ?: ""
-        }
-    }
+
 
     Column(
         modifier = Modifier
@@ -188,14 +197,16 @@ fun ProductDetailScreen(
 
                         HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFEEEEEE))
 
+                        // Ganti bagian Row di dalam Surface Detail Match:
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            DetailItem(label = "Undertone", value = bestShade?.undertone ?: "-")
+                            // Gunakan currentDisplayShade agar datanya dinamis
+                            DetailItem(label = "Undertone", value = currentDisplayShade?.undertone ?: "-")
                             Spacer(modifier = Modifier.width(60.dp))
-                            DetailItem(label = "Skintone", value = bestShade?.skintone ?: "-")
+                            DetailItem(label = "Skintone", value = currentDisplayShade?.skintone ?: "-")
                         }
                     }
                 }

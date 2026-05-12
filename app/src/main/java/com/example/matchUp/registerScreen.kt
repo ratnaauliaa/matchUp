@@ -1,6 +1,8 @@
 package com.example.matchUp
 
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import com.example.matchUp.ui.theme.MyCustomFontFamily
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.Image
@@ -23,6 +25,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -36,6 +39,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.delay
 
 
@@ -57,7 +63,6 @@ fun RegisterScreen(
 
     var isLoading by remember { mutableStateOf(false) }
 
-    // Logic: Pesan error hilang otomatis setelah 3 detik
     if (errorMessage.isNotEmpty()) {
         LaunchedEffect(errorMessage) {
             delay(3000)
@@ -65,185 +70,248 @@ fun RegisterScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(horizontal = 20.dp)
-            .verticalScroll(rememberScrollState())
-    ) {
-        Spacer(modifier = Modifier.height(30.dp))
+    val webClientId = "109685944554-hguaf4pmo075sqdl2omkm7p0e80qu56k.apps.googleusercontent.com"
+    val scope = rememberCoroutineScope()
 
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier
-                .size(40.dp)
-                .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(10.dp))
-        ) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
+    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken(webClientId)
+        .requestEmail()
+        .build()
+
+    val googleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            val email = account?.email ?: ""
+            if (email.isNotEmpty()) {
+                onRegisterSuccess()
+            }
+        } catch (e: ApiException) {
         }
+    }
 
-        Spacer(modifier = Modifier.height(30.dp))
-
-        Text(text = "Create account", fontFamily = MyCustomFontFamily, fontSize = 24.sp,color = Color.Black, fontWeight = FontWeight.Bold)
-        Text(
-            text = "Please enter your valid data to create an account.",
-            fontSize = 15.sp,
-            fontFamily = MyCustomFontFamily,
-            color = Color.Gray,
-            modifier = Modifier.padding(top = 4.dp)
-        )
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        // --- INPUT FIELDS ---
-        CustomSmallTextField(
-            label = "Name",
-            value = name, // Menggunakan variabel 'name'
-            onValueChange = {
-                name = it
-                if (errorMessage.isNotEmpty()) errorMessage = ""
-            },
-            placeholder = "your full name"
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        CustomSmallTextField(
-            label = "Email",
-            value = email,
-            onValueChange = {
-                email = it
-                if (errorMessage.isNotEmpty()) errorMessage = ""
-            },
-            placeholder = "example@gmail.com",
-            keyboardType = KeyboardType.Email
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        CustomSmallTextField(
-            label = "Create a password",
-            value = password,
-            onValueChange = {
-                password = it
-                if (errorMessage.isNotEmpty()) errorMessage = ""
-            },
-            placeholder = "must be 8 characters",
-            isPassword = true
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        CustomSmallTextField(
-            label = "Confirm password",
-            value = confirmPassword,
-            onValueChange = {
-                confirmPassword = it
-                if (errorMessage.isNotEmpty()) errorMessage = ""
-            },
-            placeholder = "re-type password",
-            isPassword = true
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // --- PERBAIKAN: Gaya Error Message (Rata Kiri / Start) ---
-        Box(
+    // --- PERBAIKAN TOMBOL BACK (START) ---
+    Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
+        // 1. Area Konten yang bisa di-scroll
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(32.dp)
-                .padding(start = 4.dp),
-            contentAlignment = Alignment.Center
+                .fillMaxSize()
+                .padding(horizontal = 20.dp)
+                .verticalScroll(rememberScrollState())
         ) {
-            if (errorMessage.isNotEmpty()) {
+            // Beri Spacer tinggi di awal agar konten tidak tertutup tombol back yang diam di atas
+            Spacer(modifier = Modifier.height(100.dp))
+
+            Text(text = "Create account", fontFamily = MyCustomFontFamily, fontSize = 24.sp, color = Color.Black, fontWeight = FontWeight.Bold)
+            Text(
+                text = "Please enter your valid data to create an account.",
+                fontSize = 15.sp,
+                fontFamily = MyCustomFontFamily,
+                color = Color.Gray,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            // --- INPUT FIELDS ---
+            CustomSmallTextField(
+                label = "Name",
+                value = name,
+                onValueChange = {
+                    name = it
+                    if (errorMessage.isNotEmpty()) errorMessage = ""
+                },
+                placeholder = "your full name"
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            CustomSmallTextField(
+                label = "Email",
+                value = email,
+                onValueChange = {
+                    email = it
+                    if (errorMessage.isNotEmpty()) errorMessage = ""
+                },
+                placeholder = "example@gmail.com",
+                keyboardType = KeyboardType.Email
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            CustomSmallTextField(
+                label = "Create a password",
+                value = password,
+                onValueChange = {
+                    password = it
+                    if (errorMessage.isNotEmpty()) errorMessage = ""
+                },
+                placeholder = "must be 8 characters",
+                isPassword = true
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            CustomSmallTextField(
+                label = "Confirm password",
+                value = confirmPassword,
+                onValueChange = {
+                    confirmPassword = it
+                    if (errorMessage.isNotEmpty()) errorMessage = ""
+                },
+                placeholder = "re-type password",
+                isPassword = true
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(32.dp)
+                    .padding(start = 4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        fontFamily = MyCustomFontFamily,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Button(
+                onClick = {
+                    when {
+                        name.isEmpty() || email.isEmpty() || password.isEmpty() -> {
+                            errorMessage = "Please fill in all details."
+                        }
+                        confirmPassword.isEmpty() -> {
+                            errorMessage = "Please confirm your password."
+                        }
+
+                        password != confirmPassword -> {
+                            errorMessage = "Passwords do not match."
+                        }
+                        !android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches() -> {
+                            errorMessage = "Please enter a valid email address."
+                        }
+                        name.length < 3 -> {
+                            errorMessage = "Name must be at least 3 characters."
+                        }
+                        password.length < 8 -> {
+                            errorMessage = "Password must be at least 8 characters."
+                        }
+                        else -> {
+                            isLoading = true
+                            authViewModel.registerUser(
+                                email = email.trim(),
+                                pass = password,
+                                name = name,
+                                onSuccess = {
+                                    isLoading = false
+                                    viewModel.updateUserName(name)
+                                    Toast.makeText(context, "Registered Successfully!", Toast.LENGTH_LONG).show()
+                                    onRegisterSuccess()
+                                },
+                                onError = { firebaseError ->
+                                    isLoading = false
+                                    errorMessage = when {
+                                        firebaseError.contains("already") || firebaseError.contains("in use") ->
+                                            "This email is already registered."
+                                        firebaseError.contains("invalid-email") ->
+                                            "Invalid email format."
+                                        firebaseError.contains("network") ->
+                                            "Network error. Check your connection."
+                                        else -> "Registration failed. Please try again."
+                                    }
+                                }
+                            )
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(42.dp)
+                    .align(Alignment.CenterHorizontally),
+                enabled = !isLoading,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD1E3)),
+                shape = RoundedCornerShape(20.dp)
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.Black, strokeWidth = 2.dp)
+                } else {
+                    Text(text = "Sign Up", color = Color.Black, fontSize = 15.sp, fontFamily = MyCustomFontFamily, fontWeight = FontWeight.Bold)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(text = "Or continue with", fontFamily = MyCustomFontFamily, modifier = Modifier.align(Alignment.CenterHorizontally), fontSize = 12.sp, color = Color.Gray)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SocialCircleButton(
+                    imageResId = R.drawable.ic_google,
+                    onClick = {
+                        val signInIntent = googleSignInClient.signInIntent
+                        launcher.launch(signInIntent)
+                    }
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                SocialCircleButton(
+                    imageResId = R.drawable.ic_mail,
+                    onClick = {
+                        val signInIntent = googleSignInClient.signInIntent
+                        launcher.launch(signInIntent)
+                    }
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                SocialCircleButton(
+                    imageResId = R.drawable.ic_fb,
+                    onClick = { /* Handle Facebook */ }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 30.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "Already have an account? ", fontSize = 13.sp, fontFamily = MyCustomFontFamily, color = Color.Gray)
                 Text(
-                    text = errorMessage,
-                    color = Color.Red,
-                    fontSize = 12.sp,
+                    text = "Sign In",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
                     fontFamily = MyCustomFontFamily,
-                    textAlign = TextAlign.Center
+                    color = Color.Black,
+                    modifier = Modifier.clickable { onSignInClick() }
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(30.dp))
-
-        // --- TOMBOL SIGN UP ---
-        Button(
-            onClick = {
-                when {
-                    name.isEmpty() || email.isEmpty() || password.isEmpty() -> {
-                        errorMessage = "Please fill in all details."
-                    }
-                    password != confirmPassword -> {
-                        errorMessage = "Passwords do not match."
-                    }
-                    password.length < 8 -> {
-                        errorMessage = "Password must be at least 8 characters."
-                    }
-                    else -> {
-                        isLoading = true
-                        authViewModel.registerUser(
-                            email = email.trim(),
-                            pass = password,
-                            name = name,
-                            onSuccess = {
-                                isLoading = false
-                                viewModel.updateUserName(name)
-                                Toast.makeText(context, "Registered Successfully!", Toast.LENGTH_LONG).show()
-                                onRegisterSuccess()
-                            },
-                            onError = { firebaseError ->
-                                isLoading = false
-                                errorMessage = when {
-                                    firebaseError.contains("already") || firebaseError.contains("in use") ->
-                                        "This email is already registered."
-                                    firebaseError.contains("invalid-email") ->
-                                        "Invalid email format."
-                                    firebaseError.contains("network") ->
-                                        "Network error. Check your connection."
-                                    else -> "Registration failed. Please try again."
-                                }
-                            }
-                        )
-                    }
-                }
-            },
+        // 2. Tombol Back (Sticky di lapisan atas)
+        Box(
             modifier = Modifier
-                .width(200.dp)
-                .height(42.dp)
-                .align(Alignment.CenterHorizontally),
-            enabled = !isLoading,
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD1E3)),
-            shape = RoundedCornerShape(20.dp)
+                .fillMaxWidth()
+                .background(Color.White) // Menutupi konten scroll saat lewat di bawahnya
+                .padding(horizontal = 20.dp, vertical = 30.dp)
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.Black, strokeWidth = 2.dp)
-            } else {
-                Text(text = "Sign Up", color = Color.Black, fontSize = 15.sp, fontFamily = MyCustomFontFamily, fontWeight = FontWeight.Bold)
+            IconButton(
+                onClick = onBack,
+                modifier = Modifier
+                    .size(40.dp)
+                    .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(10.dp))
+            ) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
             }
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-        Text(text = "Or continue with", fontFamily = MyCustomFontFamily, modifier = Modifier.align(Alignment.CenterHorizontally), fontSize = 12.sp, color = Color.Gray)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            SocialCircleButton(imageResId = R.drawable.google)
-            Spacer(modifier = Modifier.width(16.dp))
-            SocialCircleButton(imageResId = R.drawable.fb)
-        }
-
-        Spacer(modifier = Modifier.height(30.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 30.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = "Already have an account? ", fontSize = 13.sp, fontFamily = MyCustomFontFamily, color = Color.Gray)
-            Text(
-                text = "Sign In",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = MyCustomFontFamily,
-                color = Color.Black,
-                modifier = Modifier.clickable { onSignInClick() }
-            )
         }
     }
 }
@@ -323,13 +391,5 @@ fun CustomSmallTextField(
     }
 }
 
-@Composable
-fun SocialCircleButton(imageResId: Int) {
-    Box(
-        modifier = Modifier.size(45.dp).border(1.dp, Color(0xFFE0E0E0), CircleShape),
-        contentAlignment = Alignment.Center
-    ) {
-        Image(painter = painterResource(id = imageResId), contentDescription = null, modifier = Modifier.size(22.dp), contentScale = ContentScale.Fit)
-    }
-}
+
 
