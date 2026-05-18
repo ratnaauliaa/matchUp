@@ -40,16 +40,23 @@ fun WishlistScreen(viewModel: MatchViewModel, navController: NavHostController) 
     val categories = listOf("All", "Face", "Lips")
     var isGridView by remember { mutableStateOf(true) }
 
+    // PERBAIKAN LOGIKA: Sekarang memfilter berdasarkan kategori JSON secara dinamis
     val filteredProducts by remember(viewModel.savedProducts.size, searchQuery, selectedTab) {
         derivedStateOf {
-            if (selectedTab == 2) {
-                emptyList<Product>()
-            } else {
-                viewModel.savedProducts.filter {
-                    val nameMatch = it.product_name?.contains(searchQuery, ignoreCase = true) ?: false
-                    val brandMatch = it.brand?.contains(searchQuery, ignoreCase = true) ?: false
-                    nameMatch || brandMatch
+            viewModel.savedProducts.filter { product ->
+                // 1. Saring berdasarkan tab kategori yang dipilih
+                val categoryMatch = when (selectedTab) {
+                    1 -> product.category.equals("foundation", ignoreCase = true) // Tab Face
+                    2 -> product.category.equals("lips", ignoreCase = true)       // Tab Lips
+                    else -> true                                                  // Tab All
                 }
+
+                // 2. Saring berdasarkan query pencarian nama/brand
+                val nameMatch = product.product_name?.contains(searchQuery, ignoreCase = true) ?: false
+                val brandMatch = product.brand?.contains(searchQuery, ignoreCase = true) ?: false
+                val textMatch = nameMatch || brandMatch
+
+                categoryMatch && textMatch
             }
         }
     }
@@ -121,12 +128,18 @@ fun WishlistScreen(viewModel: MatchViewModel, navController: NavHostController) 
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(bottom = 100.dp)
                 ) {
-                    // MENGGUNAKAN itemsGrid (Alias untuk Grid)
                     itemsGrid(filteredProducts, key = { it.product_name ?: "" }) { product ->
-                        WishlistProductCard( // Panggil Card untuk tampilan Grid
+                        WishlistProductCard(
                             product = product,
                             onRemove = { viewModel.toggleSaveProduct(product, product.brand ?: "") },
-                            onClick = { navController.navigate("product_detail/${product.product_name}") }
+                            onClick = {
+                                // PERBAIKAN NAVIGASI: Mengarahkan detail screen sesuai kategori produknya
+                                if (product.category.equals("lips", ignoreCase = true)) {
+                                    navController.navigate("lips_product_detail/${product.product_name}")
+                                } else {
+                                    navController.navigate("product_detail/${product.product_name}")
+                                }
+                            }
                         )
                     }
                 }
@@ -136,12 +149,18 @@ fun WishlistScreen(viewModel: MatchViewModel, navController: NavHostController) 
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(bottom = 100.dp)
                 ) {
-                    // MENGGUNAKAN itemsList (Alias untuk Column)
                     itemsList(filteredProducts, key = { it.product_name ?: "" }) { product ->
-                        WishlistProductListRow( // Panggil Row untuk tampilan List
+                        WishlistProductListRow(
                             product = product,
                             onRemove = { viewModel.toggleSaveProduct(product, product.brand ?: "") },
-                            onClick = { navController.navigate("product_detail/${product.product_name}") }
+                            onClick = {
+                                // PERBAIKAN NAVIGASI: Mengarahkan detail screen sesuai kategori produknya
+                                if (product.category.equals("lips", ignoreCase = true)) {
+                                    navController.navigate("lips_product_detail/${product.product_name}")
+                                } else {
+                                    navController.navigate("product_detail/${product.product_name}")
+                                }
+                            }
                         )
                     }
                 }
@@ -184,7 +203,7 @@ fun WishlistProductCard(product: Product, onRemove: () -> Unit, onClick: () -> U
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
-            Text(product.brand ?: "Brand", fontWeight = FontWeight.Bold,color = Color.Black, fontSize = 13.sp, fontFamily = MyCustomFontFamily)
+            Text(product.brand ?: "Brand", fontWeight = FontWeight.Bold, color = Color.Black, fontSize = 13.sp, fontFamily = MyCustomFontFamily)
             Text(product.product_name ?: "Product", color = Color.Gray, fontSize = 11.sp, maxLines = 2, textAlign = TextAlign.Center, modifier = Modifier.heightIn(min = 28.dp), fontFamily = MyCustomFontFamily)
         }
     }

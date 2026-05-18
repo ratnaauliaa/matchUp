@@ -42,8 +42,9 @@ fun MainContent(
     onProfileClick: () -> Unit,
     viewModel: MatchViewModel,
     navController: NavHostController,
-    onNotificationsClick: () -> Unit,
+    onNotificationClick: () -> Unit,
     onStartMatchClick: () -> Unit,
+    onLipsMatchClick: () -> Unit,
     onUndertoneClick: () -> Unit,
     isLoggedIn: Boolean,
     onInsightClick: () -> Unit,
@@ -53,8 +54,9 @@ fun MainContent(
         onProfileClick = onProfileClick,
         viewModel = viewModel,
         navController = navController,
-        onNotificationsClick = onNotificationsClick,
+        onNotificationClick = onNotificationClick,
         onStartMatchClick = onStartMatchClick,
+        onLipsMatchClick = onLipsMatchClick,
         onUndertoneClick = onUndertoneClick,
         isLoggedIn = isLoggedIn,
         onInsightClick = onInsightClick
@@ -68,8 +70,9 @@ fun HomeScreen(
     onProfileClick: () -> Unit,
     viewModel: MatchViewModel,
     navController: NavHostController,
-    onNotificationsClick: () -> Unit,
+    onNotificationClick: () -> Unit,
     onStartMatchClick: () -> Unit,
+    onLipsMatchClick: () -> Unit,
     isLoggedIn: Boolean,
     onUndertoneClick: () -> Unit,
     onInsightClick: () -> Unit,
@@ -109,7 +112,8 @@ fun HomeScreen(
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onNotificationsClick) {
+                IconButton(onClick = onNotificationClick
+                ) {
                     Icon(
                         imageVector = Icons.Default.Notifications,
                         contentDescription = "Notifications",
@@ -155,8 +159,8 @@ fun HomeScreen(
                 containerColor = Color(0xFFFFD1E3),
                 modifier = Modifier.weight(1f),
                 onClick = {
-                    if (isLoggedIn) {
-                        onUndertoneClick()
+                    if (viewModel.isLoggedIn) {
+                        onLipsMatchClick()
                     } else {
                         navController.navigate("login")
                     }

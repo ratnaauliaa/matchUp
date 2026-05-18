@@ -14,8 +14,8 @@ data class OnboardingPage(
 // Daftar konten untuk 3 halaman onboarding sesuai gambar Anda
 val onboardingPages = listOf(
     OnboardingPage(
-        title = "Stop The Guesswork",
-        description = "Skip the trial-and-error and find what truly fits you.",
+        title = "Confused About Your Shade?",
+        description = "Find shades that truly match your skin tone with confidence.",
         imageRes = R.drawable.onbo_3,
     ),
     OnboardingPage(

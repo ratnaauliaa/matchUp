@@ -13,6 +13,10 @@ import androidx.navigation.compose.composable
 import com.example.matchUp.auth.*
 import com.example.matchUp.fdmatch.*
 import com.example.matchUp.*
+import com.example.matchUp.lipsmatch.BrandLipsSelectionScreen
+import com.example.matchUp.lipsmatch.LipsProductDetailScreen
+import com.example.matchUp.lipsmatch.LipsProductSelectionScreen
+import com.example.matchUp.lipsmatch.LipsShadeSelectionScreen
 
 @Composable
 fun SetupNavGraph(
@@ -100,10 +104,22 @@ fun SetupNavGraph(
                         navController.navigate("login")
                     }
                 },
-                onNotificationsClick = { navController.navigate("notifications") },
-                onStartMatchClick = {
+                onNotificationClick = {
+                    navController.navigate("notification")
+                },
+                onStartMatchClick = { // Ini tetap untuk Foundation Match
                     if (matchViewModel.isLoggedIn) {
+                        matchViewModel.clearMatchSelection()
                         navController.navigate("match_step1")
+                    } else {
+                        navController.navigate("login")
+                    }
+                },
+                // TAMBAHAN BARU: Aksi ketika tombol Lips Match di halaman Home diklik
+                onLipsMatchClick = {
+                    if (matchViewModel.isLoggedIn) {
+                        matchViewModel.clearMatchSelection()
+                        navController.navigate("lips_step1") // Pergi ke alur lips yang kita buat tadi
                     } else {
                         navController.navigate("login")
                     }
@@ -116,6 +132,12 @@ fun SetupNavGraph(
                     }
                 },
                 onInsightClick = { navController.navigate("insights") }
+            )
+        }
+
+        composable("notification") {
+            NotificationScreen(
+                onBack = { navController.popBackStack() }
             )
         }
 
@@ -135,12 +157,12 @@ fun SetupNavGraph(
         composable("match_step2") {
             val brand = matchViewModel.selectedBrandName
             if (brand.isEmpty()) {
-                // Safety check: jika brand kosong (backstack issue), balik ke step 1
                 LaunchedEffect(Unit) { navController.popBackStack("match_step1", false) }
             } else {
                 ProductSelectionScreen(
                     selectedBrandName = brand,
-                    productListFromDb = matchViewModel.getProductsByBrand(brand),
+                    // PERBAIKAN: Ganti menjadi getProductsByBrandAndCategory dan beri parameter "foundation"
+                    productListFromDb = matchViewModel.getProductsByBrandAndCategory(brand, "foundation"),
                     onBack = { navController.popBackStack() },
                     onNext = { product ->
                         matchViewModel.selectedProduct = product
@@ -184,18 +206,120 @@ fun SetupNavGraph(
             )
         }
 
+        // --- 4. PENINGKATAN: ALUR LIPS MATCH (LIPS MATCHING) ---
+        composable("lips_step1") {
+            // Menggunakan BrandSelectionScreen yang sama agar hemat kode (Reusability)
+            BrandLipsSelectionScreen(
+                matchViewModel = matchViewModel,
+                brandListFromDb = matchViewModel.allBrandList,
+                onBack = { navController.popBackStack() },
+                onNext = { brandName ->
+                    matchViewModel.selectedBrandName = brandName
+                    navController.navigate("lips_step2")
+                }
+            )
+        }
+
+        composable("lips_step2") {
+            val brand = matchViewModel.selectedBrandName
+            if (brand.isEmpty()) {
+                LaunchedEffect(Unit) { navController.popBackStack("lips_step1", false) }
+            } else {
+                // Menggunakan ProductSelectionScreen tapi data produk difilter khusus "lips"
+                LipsProductSelectionScreen(
+                    selectedBrandName = brand,
+                    productListFromDb = matchViewModel.getProductsByBrandAndCategory(brand, "lips"),
+                    onBack = { navController.popBackStack() },
+                    onNext = { product ->
+                        matchViewModel.selectedProduct = product
+                        navController.navigate("lips_step3")
+                    }
+                )
+            }
+        }
+
+        composable("lips_step3") {
+            val currentProduct = matchViewModel.selectedProduct
+            if (currentProduct != null) {
+                // Menggunakan ShadeSelectionScreen bawaan
+                LipsShadeSelectionScreen(
+                    product = currentProduct,
+                    viewModel = matchViewModel,
+                    onBack = { navController.popBackStack() },
+                    onAddAnother = {
+                        navController.navigate("lips_step1") {
+                            popUpTo("lips_step1") { inclusive = true }
+                        }
+                    },
+                    onFindMatches = { navController.navigate("lips_result") }
+                )
+            } else {
+                LaunchedEffect(Unit) { navController.popBackStack("lips_step1", false) }
+            }
+        }
+
+        composable("lips_result") {
+            // Memanggil ResultScreen milik package lipsmatch yang sudah difilter kategori lips
+            com.example.matchUp.lipsmatch.LipsResultScreen(
+                viewModel = matchViewModel,
+                onBack = {
+                    navController.navigate("home") { popUpTo("home") { inclusive = true } }
+                },
+                onAddMore = { navController.navigate("lips_step1") },
+                onNavigateToDetail = { productName ->
+                    navController.navigate("lips_product_detail/$productName")
+                }
+            )
+        }
+
         // --- 4. DETAILS & FEATURES ---
+        // --- UPDATE RUTE DETAIL FOUNDATION JUGA AGAR AMAN ---
         composable("product_detail/{productPath}") { backStackEntry ->
             val productPath = backStackEntry.arguments?.getString("productPath") ?: ""
 
-            // Pisahkan nama produk dan nama shade
-            val parts = productPath.split("|")
-            val pName = parts[0]
-            val sName = if (parts.size > 1) parts[1] else null
+            val pName: String
+            val sName: String?
+
+            if (productPath.contains("|")) {
+                val parts = productPath.split("|")
+                pName = parts[0]
+                sName = if (parts.size > 1) parts[1] else null
+            } else {
+                pName = productPath
+                sName = null
+            }
 
             ProductDetailScreen(
                 productName = pName,
-                initialShadeName = sName, // Kirim ke Screen
+                initialShadeName = sName,
+                viewModel = matchViewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        // --- UPDATE RUTE DETAIL LIPS DI SETUPNAVGRAPH ---
+        composable("lips_product_detail/{productPath}") { backStackEntry ->
+            val productPath = backStackEntry.arguments?.getString("productPath") ?: ""
+
+            // Ambil data nama produk dan nama shade secara aman
+            val pName: String
+            val sName: String?
+
+            if (productPath.contains("|")) {
+                // Jika dikirim dari Rekomendasi/Alur Match (ada tanda |)
+                val parts = productPath.split("|")
+                pName = parts[0]
+                sName = if (parts.size > 1) parts[1] else null
+            } else {
+                // Jika dikirim dari Wishlist (hanya nama produk saja)
+                pName = productPath
+                sName = null
+            }
+
+            // Panggil Screen Detail Lips dengan parameter yang sudah disaring aman
+            LipsProductDetailScreen(
+                productName = pName,
+                initialShadeName = sName,
                 viewModel = matchViewModel,
                 onBack = { navController.popBackStack() }
             )
@@ -218,13 +342,55 @@ fun SetupNavGraph(
             )
         }
 
-
         composable("history") {
             HistoryScreen(
                 viewModel = matchViewModel,
                 onBack = { navController.popBackStack() },
                 onNavigateToDetail = { index ->
+                    // PERBAIKAN: Arahkan ke history_detail dengan membawa indeksnya
                     navController.navigate("history_detail/$index")
+                },
+                onNavigateToLipsDetail = { index ->
+                    // PERBAIKAN: Lips history juga diarahkan ke rute detail yang sama karena di dalam historyDetails.kt kodenya sudah dinamis mengenali kategori lips
+                    navController.navigate("history_detail/$index")
+                }
+            )
+        }
+
+        // --- PERIKSA DAN PERBAIKI BAGIAN RUTE FOUNDATION INI DI SETUPNAVGRAPH.KT ---
+        composable("product_list/{brandName}") { backStackEntry ->
+            val brandName = backStackEntry.arguments?.getString("brandName") ?: ""
+
+            ProductListScreen(
+                brandName = brandName,
+                // PERBAIKAN: Samakan namanya menjadi productListFromDb
+                productListFromDb = matchViewModel.getProductsByBrandAndCategory(brandName, "foundation"),
+                onProductSelected = { product ->
+                    matchViewModel.selectedProduct = product
+                    navController.navigate("shade_list")
+                },
+                onClose = { navController.popBackStack() }
+            )
+        }
+
+
+        composable("history_detail/{historyIndex}") { backStackEntry ->
+            val indexStr = backStackEntry.arguments?.getString("historyIndex")
+            val index = indexStr?.toIntOrNull() ?: 0
+
+            HistoryDetailScreen(
+                viewModel = matchViewModel,
+                historyIndex = index,
+                onBack = { navController.popBackStack() },
+                // 1. Jika yang diklik adalah produk foundation, arahkan ke detail foundation
+                onNavigateToProductDetail = { productName ->
+                    // Pastikan rute "product_detail" ini sesuai dengan yang ada di NavGraph kamu
+                    navController.navigate("product_detail/$productName")
+                },
+                // PERBAIKAN: Tambahkan callback ini agar item rekomendasi LIPS di dalam history bisa diklik!
+                onNavigateToLipsProductDetail = { productName ->
+                    // Diarahkan ke layar detail produk lips kamu
+                    navController.navigate("lips_product_detail/$productName")
                 }
             )
         }
@@ -253,6 +419,7 @@ fun SetupNavGraph(
                 onNavigateToEditProfile = { }
             )
         }
+
 
         // --- 5. UNDERTONE FEATURE ---
         composable("undertone_test") {
@@ -301,8 +468,7 @@ fun SetupNavGraph(
                     onStartMatchClick = {
                         navController.navigate("match_step1")
                     }
-                    // HAPUS viewModel dan onNavigateToDetail dari sini
-                    // karena di file undertoneResult.kt kamu tidak ada parameter itu
+
                 )
             }
         }

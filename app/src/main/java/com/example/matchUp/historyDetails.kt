@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext // Tambahkan ini
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -28,12 +28,11 @@ fun HistoryDetailScreen(
     viewModel: MatchViewModel,
     historyIndex: Int,
     onBack: () -> Unit,
-    onNavigateToProductDetail: (String) -> Unit
+    // PERBAIKAN: Berikan callback kedua khusus untuk rute detail Lips
+    onNavigateToProductDetail: (String) -> Unit,
+    onNavigateToLipsProductDetail: (String) -> Unit = {}
 ) {
-    // 1. Ambil context untuk Toast
     val context = LocalContext.current
-
-    // 2. Mengambil data dari historyList yang bertipe HistoryItem
     val historyData = viewModel.historyList.getOrNull(historyIndex)
 
     Column(
@@ -170,7 +169,6 @@ fun HistoryDetailScreen(
                     color = Color(0xFFF5F5F5)
                 )
 
-                // Menampilkan produk yang sudah tersimpan di history
                 if (historyData.matchedProducts.isEmpty()) {
                     Text(
                         text = "No recommendation data saved.",
@@ -186,7 +184,20 @@ fun HistoryDetailScreen(
                             product = item.productName,
                             shade = item.shadeName,
                             imageUrl = item.imageUrl,
-                            onClick = { onNavigateToProductDetail(item.productName) }
+                            onClick = {
+                                // PERBAIKAN LOGIKA: Cari kategori produk asli dari database master viewModel
+                                val originalProduct = viewModel.productsData
+                                    .flatMap { it.products }
+                                    .find { it.product_name == item.productName }
+
+                                // Jalankan rute dinamis agar tidak salah masuk halaman detail
+                                if (originalProduct?.category.equals("lips", ignoreCase = true)) {
+                                    // Kirim data dengan format NamaProduk|NamaShade yang aman untuk rute baru kita kemarin
+                                    onNavigateToLipsProductDetail("${item.productName}|${item.shadeName}")
+                                } else {
+                                    onNavigateToProductDetail("${item.productName}|${item.shadeName}")
+                                }
+                            }
                         )
                     }
                 }
@@ -197,7 +208,7 @@ fun HistoryDetailScreen(
     }
 }
 
-// Komponen Pendukung
+// --- KOMPONEN PENDUKUNG (TETAP SAMA PERSIS SESUAI DESAINMU) ---
 @Composable
 fun HistoryMatchItem(text: String) {
     Row(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -232,18 +243,13 @@ fun RecommendationResultItem(brand: String, product: String, shade: String, imag
 @Composable
 fun HistoryInputWithImage(brandName: String, name: String, shade: String, imageUrl: String) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
             model = imageUrl,
             contentDescription = null,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color(0xFFF5F5F5)),
+            modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp)).background(Color(0xFFF5F5F5)),
             contentScale = ContentScale.Fit
         )
         Spacer(modifier = Modifier.width(12.dp))

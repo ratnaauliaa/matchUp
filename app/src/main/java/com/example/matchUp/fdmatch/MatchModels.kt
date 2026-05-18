@@ -15,6 +15,7 @@ data class Product(
     val id: Int = 0,
     val brand: String = "",
     val product_name: String,
+    val category: String = "",
     val image: String,
     val description: String = "",
     val shades: List<Shade> = emptyList()

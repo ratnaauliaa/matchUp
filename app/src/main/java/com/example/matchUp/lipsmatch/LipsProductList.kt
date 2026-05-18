@@ -1,5 +1,6 @@
-package com.example.matchUp.fdmatch
+package com.example.matchUp.lipsmatch
 
+import com.example.matchUp.fdmatch.Product
 import androidx.compose.foundation.BorderStroke
 import com.example.matchUp.ui.theme.MyCustomFontFamily
 import androidx.compose.foundation.background
@@ -21,19 +22,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductListScreen(
+fun LipsProductListScreen(
     brandName: String,
-    // PERBAIKAN 1: Samakan nama parameter menjadi productListFromDb agar sinkron dengan SetupNavGraph
-    productListFromDb: List<Product>,
+    productList: List<Product>, // Menggunakan model Product yang berisi nama dan URL gambar
     onProductSelected: (Product) -> Unit,
     onClose: () -> Unit
 ) {
     var searchText by remember { mutableStateOf("") }
 
-    // Filter produk berdasarkan input pencarian menggunakan parameter baru
-    val filteredProducts = productListFromDb.filter {
+    // Filter produk berdasarkan input pencarian
+    val filteredProducts = productList.filter {
         it.product_name.contains(searchText, ignoreCase = true)
     }
 
@@ -59,8 +58,7 @@ fun ProductListScreen(
                 onValueChange = { searchText = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp)
-                    .padding(end = 16.dp), // Beri padding sedikit di ujung kanan textfield
+                    .height(48.dp),
                 singleLine = true,
                 textStyle = LocalTextStyle.current.copy(
                     color = Color.Black,
@@ -97,7 +95,7 @@ fun ProductListScreen(
             )
         } // --- BATAS ROW (Header Selesai) ---
 
-        // PERBAIKAN 2: Divider dipindahkan ke luar Row (di dalam Column induk) agar memotong lurus sempurna
+        // --- DIBAIKI: Divider dipindah ke luar Row (di dalam Column induk) agar memotong lurus dengan sempurna ---
         Spacer(modifier = Modifier.height(2.dp))
         HorizontalDivider(
             modifier = Modifier.padding(vertical = 12.dp),
@@ -133,7 +131,7 @@ fun ProductListScreen(
 
                         // Gambar Produk (Thumbnail Kanan)
                         AsyncImage(
-                            model = product.image,
+                            model = product.image, // URL Gambar dari JSON
                             contentDescription = null,
                             modifier = Modifier.size(30.dp),
                             contentScale = ContentScale.Fit

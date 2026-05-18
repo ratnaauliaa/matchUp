@@ -1,5 +1,7 @@
-package com.example.matchUp.fdmatch
+package com.example.matchUp.lipsmatch
 
+import com.example.matchUp.fdmatch.MatchViewModel
+import com.example.matchUp.fdmatch.MatchedProduct
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -27,7 +29,7 @@ import com.example.matchUp.ui.theme.MyCustomFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ResultScreen(
+fun LipsResultScreen(
     viewModel: MatchViewModel,
     onBack: () -> Unit,
     onAddMore: () -> Unit,
@@ -35,15 +37,15 @@ fun ResultScreen(
 ) {
     val lastUserMatch = viewModel.selectedMatches.lastOrNull()
 
-    // 1. Logika untuk menghasilkan list rekomendasi yang akan ditampilkan & disimpan
+    // 1. DIBAIKI: Tambah logika filter kategori "lips" agar yang direkomendasikan murni produk bibir
     val recommendations = remember(lastUserMatch) {
         if (lastUserMatch != null) {
             viewModel.productsData.flatMap { brandDetail ->
-                // PERBAIKAN DI SINI: Filter produk agar hanya kategori foundation yang diproses
+                // Filter produk di dalam brand yang bertipe lips saja
                 brandDetail.products
-                    .filter { it.category.equals("foundation", ignoreCase = true) }
+                    .filter { it.category.equals("lips", ignoreCase = true) }
                     .map { product ->
-                        // Cari shade terbaik untuk setiap produk foundation
+                        // Cari shade terbaik untuk setiap produk lips
                         val bestShade = product.shades.minByOrNull { targetShade ->
                             viewModel.calculateColorDistance(lastUserMatch.shade.hex, targetShade.hex)
                         }
@@ -55,7 +57,7 @@ fun ResultScreen(
                         )
                     }
             }.filter { matchedProd ->
-                // Filter agar produk yang diinput user tidak muncul lagi di rekomendasi
+                // Filter agar produk lips yang diinput user tidak muncul lagi di rekomendasi
                 viewModel.selectedMatches.none { it.product.product_name == matchedProd.productName }
             }.take(100)
         } else {
@@ -164,7 +166,33 @@ fun ResultScreen(
                 // --- SECTION 2: RECOMMENDATIONS ---
                 if (specificProductSearch != null) {
                     ResultHeader(title = "Your best match:", icon = Icons.Default.FactCheck)
-                    // ... (logika specific search tetap sama) ...
+
+                    // Filter rekomendasi spesifik berdasarkan input pencarian user
+                    val filteredResult = recommendations.find {
+                        it.productName.contains(specificProductSearch ?: "", ignoreCase = true)
+                    }
+
+                    if (filteredResult != null) {
+                        RecommendationResultItem(
+                            brand = filteredResult.brand,
+                            product = filteredResult.productName,
+                            shade = filteredResult.shadeName,
+                            imageUrl = filteredResult.imageUrl,
+                            onClick = { onNavigateToDetail(filteredResult.productName) }
+                        )
+                    } else {
+                        Text(
+                            text = "No specific product match found.",
+                            color = Color.Gray,
+                            fontSize = 14.sp,
+                            fontFamily = MyCustomFontFamily,
+                            modifier = Modifier.padding(vertical = 12.dp)
+                        )
+                    }
+
+                    TextButton(onClick = { specificProductSearch = null }) {
+                        Text("Show all recommendations", color = Color(0xFF4285F4), fontSize = 12.sp, fontFamily = MyCustomFontFamily, textDecoration = TextDecoration.Underline)
+                    }
                 } else {
                     ResultHeader(title = "Browse all recommendations:", icon = Icons.Default.FactCheck)
 
@@ -175,7 +203,7 @@ fun ResultScreen(
                         }, fontSize = 12.sp, fontFamily = MyCustomFontFamily)
                     }
 
-                    // TAMPILKAN REKOMENDASI DARI LIST YANG SUDAH DIBUAT DI ATAS
+                    // TAMPILKAN REKOMENDASI DARI LIST YANG SUDAH DIFILTER KHUSUS LIPS DI ATAS
                     recommendations.forEach { item ->
                         RecommendationResultItem(
                             brand = item.brand,
@@ -190,7 +218,6 @@ fun ResultScreen(
             }
         }
 
-        // ModalBottomSheet tetap sama...
         if (showSheet) {
             ModalBottomSheet(
                 onDismissRequest = { showSheet = false },
@@ -237,21 +264,24 @@ fun SearchProductSheet(onFindMatch: (String, String) -> Unit) {
         )
         Spacer(modifier = Modifier.height(16.dp))
 
+        // DIBAIKI: Mengumumkan label teks font keluarga & Menghapus .height(48.dp) mutlak agar layout textfield tidak memotong text input/label
         OutlinedTextField(
             value = brandInput,
             onValueChange = { brandInput = it },
-            label = { Text("Brand") },
-            placeholder = { Text("e.g. Wardah") },
-            modifier = Modifier.fillMaxWidth().height(48.dp),
+            label = { Text("Brand", fontFamily = MyCustomFontFamily) },
+            placeholder = { Text("e.g. Wardah", fontFamily = MyCustomFontFamily) },
+            modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp)
         )
+
+        Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
             value = productInput,
             onValueChange = { productInput = it },
-            label = { Text("Product") },
-            placeholder = { Text("Enter product name") },
-            modifier = Modifier.fillMaxWidth().height(48.dp),
+            label = { Text("Product", fontFamily = MyCustomFontFamily) },
+            placeholder = { Text("Enter product name", fontFamily = MyCustomFontFamily) },
+            modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
             trailingIcon = { Icon(Icons.Default.Search, null) }
         )
@@ -310,7 +340,8 @@ fun RecommendationResultItem(brand: String, product: String, shade: String, imag
         )
         Spacer(modifier = Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(brand.uppercase(), fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Color.Black)
+            // DIBAIKI: Ditambahkan font family kustom agar konsisten dengan teks lainnya
+            Text(brand.uppercase(), fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Color.Black, fontFamily = MyCustomFontFamily)
             Text(product, fontSize = 13.sp, color = Color.DarkGray, maxLines = 1, fontFamily = MyCustomFontFamily)
             Text("Your Shade: $shade", fontSize = 13.sp, color = Color.DarkGray, fontFamily = MyCustomFontFamily)
         }

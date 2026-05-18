@@ -1,5 +1,6 @@
-package com.example.matchUp.fdmatch
+package com.example.matchUp.lipsmatch
 
+import com.example.matchUp.fdmatch.MatchViewModel
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -24,13 +25,12 @@ import com.example.matchUp.ui.theme.MyCustomFontFamily
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ProductDetailScreen(
+fun LipsProductDetailScreen(
     productName: String,
     initialShadeName: String? = null,
     viewModel: MatchViewModel,
     onBack: () -> Unit
 ) {
-    // 1. Tambahkan pengecekan data di awal (Safety First)
     val brandDetail = viewModel.productsData.find { brand ->
         brand.products.any { it.product_name == productName }
     }
@@ -38,32 +38,35 @@ fun ProductDetailScreen(
 
     val lastMatch = viewModel.selectedMatches.lastOrNull()
 
-    // Perbaikan: Tambahkan default hex jika lastMatch null agar tidak error saat hitung distance
-    val bestShade = productData?.shades?.minByOrNull { shade ->
-        viewModel.calculateColorDistance(lastMatch?.shade?.hex ?: "#FFFFFF", shade.hex)
+    // PERBAIKAN LOGIKA: Jika riwayat match kosong, langsung tunjuk shade pertama agar aman dari crash
+    val bestShade = if (lastMatch != null) {
+        productData?.shades?.minByOrNull { shade ->
+            viewModel.calculateColorDistance(lastMatch.shade.hex, shade.hex)
+        }
+    } else {
+        // Jika dari wishlist/rekomendasi, gunakan initialShadeName sebagai kecocokan terbaik atau default ke shade pertama
+        productData?.shades?.find { it.shade_name == initialShadeName } ?: productData?.shades?.firstOrNull()
     }
 
-    // Ganti state ini
-    var selectedShadeName by remember { mutableStateOf(initialShadeName ?: "") }
+    // Set default initial selection dengan pengaman mendasar
+    var selectedShadeName by remember { mutableStateOf(initialShadeName ?: bestShade?.shade_name ?: "") }
 
-    // Update logika LaunchedEffect agar lebih pintar
     LaunchedEffect(productData, bestShade) {
         if (selectedShadeName.isEmpty()) {
-            // Jika tidak ada initialShadeName, baru gunakan hasil hitungan bestShade
             selectedShadeName = bestShade?.shade_name ?: ""
         }
     }
 
-    // Cari data shade yang sedang dipilih (untuk ditampilkan di Undertone/Skintone detail)
-    val currentDisplayShade = productData?.shades?.find { it.shade_name == selectedShadeName } ?: bestShade
+    // Cari data shade yang sedang aktif ditampilkan dengan fallback berjenjang agar terhindar dari null pointer
+    val currentDisplayShade = productData?.shades?.find { it.shade_name == selectedShadeName }
+        ?: bestShade
+        ?: productData?.shades?.firstOrNull()
+
     var feedback by remember { mutableStateOf<Boolean?>(null) }
 
-    // Perbaikan: Gunakan derivedStateOf agar UI responsif saat klik "Love"
     val isSaved by remember(viewModel.savedProducts.size) {
         derivedStateOf { viewModel.savedProducts.any { it.product_name == productName } }
     }
-
-
 
     Column(
         modifier = Modifier
@@ -92,17 +95,15 @@ fun ProductDetailScreen(
                 text = "Product Details",
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
-                fontSize = 24.sp, // Sesuaikan ukuran agar tidak terlalu besar
+                fontSize = 24.sp,
                 color = Color.Black,
                 fontFamily = MyCustomFontFamily,
                 fontWeight = FontWeight.Bold
             )
-            val isSaved = viewModel.isProductSaved(productData?.product_name ?: "")
 
             IconButton(
                 onClick = {
                     productData?.let {
-                        // FIX: Tambahkan brandDetail?.brand sebagai parameter kedua
                         viewModel.toggleSaveProduct(it, brandDetail?.brand ?: "Unknown Brand")
                     }
                 }
@@ -120,7 +121,7 @@ fun ProductDetailScreen(
         Column(
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
         ) {
-            // 2. GAMBAR PRODUK
+            // --- GAMBAR PRODUK ---
             Box(
                 modifier = Modifier.fillMaxWidth().height(280.dp).padding(20.dp),
                 contentAlignment = Alignment.Center
@@ -135,7 +136,7 @@ fun ProductDetailScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // 1. NAMA PRODUK
+            // --- NAMA PRODUK ---
             Column(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -165,7 +166,7 @@ fun ProductDetailScreen(
             HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFF5F5F5))
             Spacer(modifier = Modifier.height(10.dp))
 
-            // 3. DETAIL MATCH
+            // --- DETAIL MATCH ---
             Column(modifier = Modifier.padding(horizontal = 20.dp)) {
                 Surface(
                     color = Color(0xFFF9F9F9),
@@ -197,13 +198,11 @@ fun ProductDetailScreen(
 
                         HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFEEEEEE))
 
-                        // Ganti bagian Row di dalam Surface Detail Match:
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // Gunakan currentDisplayShade agar datanya dinamis
                             DetailItem(label = "Undertone", value = currentDisplayShade?.undertone ?: "-")
                             Spacer(modifier = Modifier.width(60.dp))
                             DetailItem(label = "Skintone", value = currentDisplayShade?.skintone ?: "-")
@@ -217,7 +216,6 @@ fun ProductDetailScreen(
                 Text("Selected: $selectedShadeName", fontSize = 13.sp, color = Color.Gray, fontFamily = MyCustomFontFamily)
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // PERBAIKAN: Gunakan try-catch pada Color.parseColor agar tidak crash jika HEX salah
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -253,7 +251,6 @@ fun ProductDetailScreen(
                     }
                 }
 
-                // PERBAIKAN: Cek null pada description agar String.length() tidak error
                 if (!productData?.description.isNullOrEmpty()) {
                     Spacer(modifier = Modifier.height(10.dp))
                     HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFF5F5F5))
@@ -300,22 +297,17 @@ fun DetailItem(label: String, value: String) {
 @Composable
 fun FeedbackSection(currentFeedback: Boolean?, onFeedbackClick: (Boolean) -> Unit) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {
         Surface(
-            modifier = Modifier
-                .width(250.dp)
-                .height(45.dp),
+            modifier = Modifier.width(250.dp).height(45.dp),
             color = Color.White,
             shape = RoundedCornerShape(20.dp),
             border = BorderStroke(1.dp, Color(0xFFF0F0F0))
         ) {
             Row(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 2.dp),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {

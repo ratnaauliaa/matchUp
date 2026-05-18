@@ -4,6 +4,7 @@
     "products": [
       {
         "product_name": "Copy Paste Tinted Sunscreen",
+        "category": "foundation",
         "image": "https://images.somethinc.com/uploads/products/thumbs/800x800/PDP-Perfect-Match-Complexion-BG-PUTIH-SS-Tinted.jpg",
         "description": "Breakthrough Innovation SKIN TINT + SUNSCREEN with a super lightweight & breathable formula. It blurs uneven skin tone with a healthy, glowing finish while protecting your skin from UVA & UVB rays.",
         "shades": [
@@ -25,6 +26,7 @@
       },
       {
         "product_name": "HOOMAN Breathable Cushion Cover SPF 35 PA++++",
+        "category": "foundation",
         "image": "https://images.somethinc.com/uploads/products/thumbs/800x800/PDP_Hooman_WhiteBG.jpg",
         "description": "HOOMAN Cushion is powered by anti-bacterial Breathable Technology and a non-oxidizing formula. Achieve Medium to High Coverage that blurs pores and fine lines in just one tap!",
         "shades": [
@@ -46,6 +48,7 @@
       },
       {
         "product_name": "Hooman Under Control HD Blur Loose Powder",
+        "category": "foundation",
         "image": "https://images.somethinc.com/uploads/products/thumbs/800x800/HOOMAN_UNDER_CONTROL_WEBSITE.jpg",
         "description": "STAY MATTE, BUT NOT FLAT! EVERYTHING IS UNDER CONTROL! Achieve an instant live filter effect with our HD Blur Loose Powder. Formulated with super-fine nano particles, it locks in oil for up to 16 hours, blurs pores, and smooths skin texture effortlessly.",
         "shades": [
@@ -66,6 +69,7 @@
       },
       {
         "product_name": "Copy Paste CoverBlur Powder Foundation",
+        "category": "foundation",
         "image": "https://images.somethinc.com/uploads/products/thumbs/800x800/PDP-COVERBLUR-WHITEBG.jpg",
         "description": "One swipe Coverblur! A seamless, undetectable powder foundation with a zero-cakey, zero-cracky, and zero-pore formula. It offers medium-to-full coverage that effortlessly hides imperfections, blurs pores, and smooths out skin texture.",
         "shades": [
@@ -84,6 +88,49 @@
           { "shade_name": "Goddess", "hex": "#daaf90", "undertone": "Warm", "skintone": "Tan" },
           { "shade_name": "Tiffany", "hex": "#c99770", "undertone": "Warm", "skintone": "Deep" }
         ]
+      },
+      {
+        "product_name": "Forever Stay Comfort Lip Glaze",
+        "category": "lips",
+        "image": "https://s3.ap-southeast-1.amazonaws.com/assets.femaledaily.com/remastering-data/production/product/product-1740554133173-9b98c6c6-745a-4726-82d2-d583ce04e150",
+        "description": "Transferproof 3D Lip Glaze with unbeatable hydration!",
+        "shades": [
+          { "shade_name": "Uno", "hex": "#c9665a", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Hustle", "hex": "#b6504b", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Treschic", "hex": "#c56362", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "PWR", "hex": "#9f3541", "undertone": "Cool", "skintone": "Deep" },
+          { "shade_name": "Unreal", "hex": "#c06674", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Mantra", "hex": "#a44b4a", "undertone": "Warm", "skintone": "Deep" },
+          { "shade_name": "Sassy", "hex": "#ab3f44", "undertone": "Warm", "skintone": "Deep" },
+          { "shade_name": "Notty", "hex": "#ba6562", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Selfmade", "hex": "#b55f60", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Lucky", "hex": "#b24e60", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Greedy", "hex": "#b15a5d", "undertone": "Warm", "skintone": "Deep" },
+          { "shade_name": "Honest", "hex": "#c47160", "undertone": "Warm", "skintone": "Light" }
+        ]
+      },
+      {
+        "product_name": "Ceraplump Tinted Lip Balm SPF25 PA++++",
+        "category": "lips",
+        "image": "https://images.somethinc.com/uploads/products/thumbs/800x800/PDP-COVER-CERAPLUMP-White-BG.jpg",
+        "description": "SPF Tinted Lip Balm for instant juicy, healthy, plumpy lips!",
+        "shades": [
+          { "shade_name": "Rabbit", "hex": "#fe7d85", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Sorbet", "hex": "#ee8a7b", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Pecan", "hex": "#994a4c", "undertone": "Warm", "skintone": "Deep" },
+          { "shade_name": "Lace", "hex": "#bb4a46", "undertone": "Warm", "skintone": "Deep" },
+          { "shade_name": "Sangria", "hex": "#921e21", "undertone": "Warm", "skintone": "Deep" },
+          { "shade_name": "Valentine", "hex": "#cd6661", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Ballet", "hex": "#e87d79", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Ribbon", "hex": "#ea5e62", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Sakura", "hex": "#9c263a", "undertone": "Cool", "skintone": "Deep" },
+          { "shade_name": "Walnut", "hex": "#c15b57", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Raisin", "hex": "#b45654", "undertone": "Warm", "skintone": "Deep" },
+          { "shade_name": "Coquette", "hex": "#a6474d", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Petal", "hex": "#a9535b", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Cherry", "hex": "#8c2a3b", "undertone": "Cool", "skintone": "Deep" },
+          { "shade_name": "Flirty", "hex": "#994a4c", "undertone": "Neutral", "skintone": "Medium" }
+        ]
       }
     ]
   },
@@ -92,6 +139,7 @@
     "products": [
       {
         "product_name": "Serum Cushion Soulmatte",
+        "category": "foundation",
         "image": "https://hanasui.id/front-end/assets/img/product_image/d8d7f7ed1914585cef1a77a7fc4bcc68.png",
         "description": "Hanasui Serum Cushion Soulmatte is a high-performance cushion that delivers a flawless matte finish. Infused with a powerful blend of Niacinamide, Sodium Hyaluronate, and Peptides.",
         "shades": [
@@ -109,6 +157,7 @@
       },
       {
         "product_name": "Serum Cushion",
+        "category": "foundation",
         "image": "https://hanasui.id/front-end/assets/img/product_image/48cbaab5b93b16c727a84066754078fc.png",
         "description": "Hanasui Serum Cushion is a skincare-infused cushion enriched with Niacinamide, Sodium Hyaluronate, Vitamin E, and Aloe Vera Extract. Delivers a flawless makeup look with a natural dewy finish.",
         "shades": [
@@ -126,6 +175,7 @@
       },
       {
         "product_name": "Perfect Stay Foundation",
+        "category": "foundation",
         "image": "https://hanasui.id/front-end/assets/img/product_image/486d1f39d2d7c39f035b2d6a84e2abf1.png",
         "description": "Hanasui Perfect Stay Foundation is a liquid foundation with a lightweight and long-wearing formula. Powered by oil-control technology, it delivers a natural matte finish that remains transferproof throughout the day.",
         "shades": [
@@ -148,6 +198,44 @@
           { "shade_name": "Brownie", "hex": "#ce8c69", "undertone": "Neutral", "skintone": "Medium" },
           { "shade_name": "Deep", "hex": "#bd8160", "undertone": "Warm", "skintone": "Medium" }
         ]
+      },
+      {
+        "product_name": "Mattedorable Lip Cream",
+        "category": "lips",
+        "image": "https://hanasui.id/front-end/assets/img/product_image/bf83c7d933d5f63108fb3b2c327f8cf3.png",
+        "description": "2-in-1 Hybrid Lip Cream with olive oil and vitamin E to moisturize. It features a creamy texture, high coverage, rich pigmentation, and is transfer-proof, lasting up to 12 hours with a lightweight, non-cracking velvet matte finish.",
+        "shades": [
+          { "shade_name": "Kiss", "hex": "#9c3c44", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Posh", "hex": "#c63464", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Star", "hex": "#e64468", "undertone": "Neutral", "skintone": "Light" },
+          { "shade_name": "Chic", "hex": "#e06874", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Classy", "hex": "#c48474", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Ritz", "hex": "#e48577", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Spark", "hex": "#d7948c", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Fancy", "hex": "#e47959", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Fame", "hex": "#bc7c74", "undertone": "Warm", "skintone": "Medium" },
+          { "shade_name": "Allure", "hex": "#bc6c64", "undertone": "Neutral", "skintone": "Deep" },
+          { "shade_name": "Brick", "hex": "#cc6259", "undertone": "Neutral", "skintone": "Deep" },
+          { "shade_name": "Amaze", "hex": "#c4766e", "undertone": "Warm", "skintone": "Deep" },
+          { "shade_name": "Adore", "hex": "#df9a95", "undertone": "Cool", "skintone": "Light" },
+          { "shade_name": "Dusty", "hex": "#e47484", "undertone": "Cool", "skintone": "Medium" },
+          { "shade_name": "Flame", "hex": "#904853", "undertone": "Cool", "skintone": "Medium" },
+          { "shade_name": "Glam", "hex": "#ac4b55", "undertone": "Cool", "skintone": "Deep" }
+        ]
+      },
+      {
+        "product_name": "Mattedorable Lip Cream Boba",
+        "category": "lips",
+        "image": "https://hanasui.id/front-end/assets/img/product_image/e8bc9c71323f0464c07c023250d916a7.png",
+        "description": "Hanasui Mattedorable Lip Cream Boba is a lip cream with a delightful boba scent. It features a lightweight velvet matte finish, a long-lasting formula, and perfect pigmentation. Enriched with olive oil and vitamin E to keep lips well-hydrated.",
+        "shades": [
+          { "shade_name": "Forest Berry", "hex": "#945c4c", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Brown Sugar", "hex": "#945c4c", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Salted Caramel", "hex": "#ac6464", "undertone": "Neutral", "skintone": "Medium" },
+          { "shade_name": "Pink Lava", "hex": "#d46c7c", "undertone": "Cool", "skintone": "Medium" },
+          { "shade_name": "Creamy Peach", "hex": "#c84c54", "undertone": "Warm", "skintone": "Light" },
+          { "shade_name": "Hazelnut Latte", "hex": "#944b42", "undertone": "Warm", "skintone": "Deep" }
+        ]
       }
     ]
   },
@@ -156,6 +244,7 @@
     "products": [
       {
         "product_name": "Coverlast Two Way Cake",
+        "category": "foundation",
         "image": "https://mjbeauty.id/wp-content/uploads/2025/08/1739940722143336.jpeg",
         "description": "A high-performance combination of powder and foundation powered by the latest COLORADVANCED TECH. It delivers medium coverage and a silky-smooth finish to seamlessly mask uneven skin tone and imperfections.",
         "shades": [
@@ -166,6 +255,7 @@
       },
       {
         "product_name": "Coverlast Cushion",
+        "category": "foundation",
         "image": "https://storage.googleapis.com/6e927a7a-fad5-437f-bf8d-228eec029d0f/K36Gr3nICS1c8lDmXgZZA.jpg",
         "description": "OMG Coverlast Cushion delivers high-performance coverage with superior skin attachment. Powered by Color Advanced Tech 2.0, the formula is non-oxidizing and long-lasting for up to 12 hours.",
         "shades": [
@@ -184,6 +274,7 @@
     "products": [
       {
         "product_name": "Colorfit 5D Blur Cloud Cushion",
+        "category": "foundation",
         "image": "https://d2jlkn4m127vak.cloudfront.net/medias/products/variant-1762750259.webp",
         "description": "Wardah Colorfit 5D Blur Cloud Cushion is a high-performance foundation that delivers a sophisticated soft-matte finish. Formulated with innovative 5D Pore-Blurring Powder and infused with nano-Hyaluron + CICA.",
         "shades": [
@@ -199,6 +290,7 @@
       },
       {
         "product_name": "Colorfit Perfect Glow Cushion",
+        "category": "foundation",
         "image": "https://d2jlkn4m127vak.cloudfront.net/medias/products/variant-1762748213.webp",
         "description": "High-performance cushion providing a radiant glow finish while keeping the skin hydrated and comfortable for up to 18 hours.",
         "shades": [
@@ -220,6 +312,7 @@
       },
       {
         "product_name": "Lightening Liquid Foundation 6ml",
+        "category": "foundation",
         "image": "https://d2jlkn4m127vak.cloudfront.net/medias/products/variant-1644227011.png",
         "description": "Liquid foundation yang terasa ringan dan nyaman digunakan sehari-hari. Memilki coverage medium, mencerahkan, dan tahan lama hingga 12 jam.",
         "shades": [
@@ -231,6 +324,7 @@
       },
       {
         "product_name": "Colorfit HD Blurify Loose Powder",
+        "category": "foundation",
         "image": "https://image.astronauts.cloud/product-images/2026/1/27469_152afe3c-e3e9-4a4e-8efa-0e0655e9536d_900x900.jpg",
         "description": "Bedak tabur ringan dengan Long Lasting Oil Control untuk hasil akhir matte yang menyamarkan pori-pori dan memperhalus tekstur kulit (efek HD). Tahan lama hingga 16 jam.",
         "shades": [
@@ -248,6 +342,7 @@
     "products": [
       {
         "product_name": "Minimalist Blurring Serum Skin Tint SPF 35 PA++",
+        "category": "foundation",
         "image": "https://www.soco.id/cdn-cgi/image/w=360,format=auto,quality=100,dpr=1.5/https://images.soco.id/15594f67-9e99-4cb3-aa4f-47b92939fe73-image-0-1723618858933",
         "description": "Serum-Powered Blurring Skin Tint with medium-buildable coverage that delivers natural velvet finish and 24-Hour longlasting wear. Powered by Blurring MetagramTM Technology.",
         "shades": [
@@ -265,6 +360,7 @@
       },
       {
         "product_name": "Flawless Cushion Serum SPF 50+ PA+++ - Satin",
+        "category": "foundation",
         "image": "https://cdn.beautyhaul.com/assets/uploads/products/thumbs/800x800/ESQ-BCC-00059.001_14.webp",
         "description": "A 3-in-1 cushion that gives full coverage foundation, infused with 6X premium serum actives to calm, soothe, and brighten skin while providing SPF 50+ PA+++ protection.",
         "shades": [
@@ -280,6 +376,7 @@
       },
       {
         "product_name": "Minimalist Serum Concealer",
+        "category": "foundation",
         "image": "https://s3.ap-southeast-1.amazonaws.com/assets.femaledaily.com/remastering-data/production/product/product-1718179480714-",
         "description": "A hybrid serum-concealer that provides weightless, buildable coverage while improving skin health with multi-active ingredients. Dermatologically tested and safe for all skin types.",
         "shades": [
@@ -297,6 +394,7 @@
       },
       {
         "product_name": "Flawless Liquid Concealer",
+        "category": "foundation",
         "image": "https://esqacosmetics.com/cdn/shop/products/orange_with_swatch_600x600_crop_center.jpg?v=1638425210",
         "description": "Long-wearing, full coverage, and crease-proof formula that blurs skin imperfections and brightens the under-eye area without flaking.",
         "shades": [
@@ -314,6 +412,7 @@
       },
       {
         "product_name": "Flawless Powder Foundation",
+        "category": "foundation",
         "image": "https://www.soco.id/cdn-cgi/image/w=360,format=auto,quality=100,dpr=1.5/https://images.soco.id/image-0-1606721142130",
         "description": "A long-wearing powder foundation with medium-to-full buildable coverage and a velvet matte finish that controls shine all day.",
         "shades": [
@@ -325,6 +424,7 @@
       },
       {
         "product_name": "Flawless Micro Setting Powder",
+        "category": "foundation",
         "image": "https://www.soco.id/cdn-cgi/image/w=360,format=auto,quality=100,dpr=1.5/https://images.soco.id/e00c967c-a228-49b9-a611-d38ee98eb5b8-image-0-1721363501349",
         "description": "Micro-fine powder that instantly blurs pores and fine lines, sets makeup without looking cakey, and creates a natural radiant effect.",
         "shades": [

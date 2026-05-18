@@ -16,7 +16,7 @@ import kotlin.math.sqrt
 import com.example.matchUp.UndertoneResult
 
 // =====================================================================
-// 1. MODEL DATA
+// 1. MODEL DATA (TETAP SAMA PERSIS SESUAI KODE ASLIMU)
 // =====================================================================
 
 data class BrandInfo(
@@ -49,7 +49,6 @@ data class UndertoneDataWrapper(
     val undertone_results: List<UndertoneResult>
 )
 
-// Model untuk menyimpan produk hasil match di dalam history
 data class MatchedProduct(
     val brand: String,
     val productName: String,
@@ -60,7 +59,7 @@ data class MatchedProduct(
 data class HistoryItem(
     val date: String,
     val details: List<String>,
-    val inputProducts: List<SelectedMatchData>, // Sudah disamakan
+    val inputProducts: List<SelectedMatchData>,
     val matchedProducts: List<MatchedProduct>
 )
 
@@ -73,8 +72,6 @@ data class Rgb(val r: Int, val g: Int, val b: Int)
 class MatchViewModel : ViewModel() {
 
     // --- USER PROFILE STATE ---
-
-
     var isLoggedIn by mutableStateOf(false)
     var userName by mutableStateOf("Guest")
     var userEmail by mutableStateOf("")
@@ -104,18 +101,18 @@ class MatchViewModel : ViewModel() {
     var neutralScore by mutableStateOf(0)
     var finalUndertone by mutableStateOf("")
     var undertoneResults by mutableStateOf<List<UndertoneResult>>(listOf())
-    var filteredRecommendations by mutableStateOf<List<Triple<String, Product, Shade>>>(emptyList())
+
+    // Simpan data rekomendasi umum
+    var filteredRecommendations by mutableStateOf<List<Triple<String, Product, Shade>>>(kotlin.collections.emptyList())
     var personalizedRecommendations = mutableStateListOf<Pair<String, Product>>()
 
     // 1. Wishlist Logic
-    // Di MatchViewModel.kt
     fun toggleSaveProduct(product: Product, currentBrand: String) {
         val index = savedProducts.indexOfFirst { it.product_name == product.product_name }
 
         if (index != -1) {
             savedProducts.removeAt(index)
         } else {
-            // PAKSA brand-nya diisi dari parameter yang dikirim
             val fixedProduct = product.copy(brand = currentBrand)
             savedProducts.add(0, fixedProduct)
         }
@@ -192,6 +189,13 @@ class MatchViewModel : ViewModel() {
         selectedShade = null
     }
 
+    fun clearMatchSelection() {
+        selectedMatches.clear()
+        selectedProduct = null
+        selectedShade = null
+        selectedBrandName = ""
+    }
+
     fun saveCurrentMatchToHistory(results: List<MatchedProduct>) {
         val currentDetails = selectedMatches.map {
             "${it.brandName} - ${it.product.product_name} (${it.shade.shade_name})"
@@ -205,7 +209,6 @@ class MatchViewModel : ViewModel() {
         val newHistory = HistoryItem(
             date = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date()),
             details = currentDetails,
-            // Menggunakan .toList() untuk membuat salinan data saat ini (Immutable)
             inputProducts = selectedMatches.toList(),
             matchedProducts = results
         )
@@ -238,56 +241,67 @@ class MatchViewModel : ViewModel() {
             val jsonString = context.assets.open("undertone_data.json").bufferedReader().use { it.readText() }
             val dataWrapper: UndertoneDataWrapper = Gson().fromJson(jsonString, object : TypeToken<UndertoneDataWrapper>() {}.type)
 
-            // Save to state so it can be accessed by NavGraph or Screens
             undertoneResults = dataWrapper.undertone_results
-
             Log.d("MatchVM", "Successfully loaded undertone data from JSON")
         } catch (e: Exception) {
             Log.e("MatchVM", "Failed to load undertone JSON: ${e.message}")
         }
     }
 
-// Di dalam MatchViewModel.kt
-
-    // 1. Tambahkan variabel ini untuk menyimpan hasil yang sudah "dikunci"
-
+    // DIBAIKI: Tambahkan filter kategori dasar "foundation" agar hasil rekomendasi tes murni kosmetik wajah
     fun updateRecommendations(userUndertone: String) {
-        // Jika data sudah ada, jangan acak ulang (ini kunci agar tidak ngerandom terus)
         if (filteredRecommendations.isNotEmpty() && userUndertone.isNotEmpty()) return
 
         if (userUndertone.isEmpty()) {
-            filteredRecommendations = emptyList()
+            filteredRecommendations = kotlin.collections.emptyList()
             return
         }
 
-        val recommendedList = mutableListOf<Triple<String, Product, Shade>>()
+        // Buat dua keranjang terpisah agar adil
+        val foundationList = mutableListOf<Triple<String, Product, Shade>>()
+        val lipsList = mutableListOf<Triple<String, Product, Shade>>()
 
         productsData.forEach { brandObj ->
             brandObj.products.forEach { product ->
-                // Cari shade yang COCOK PERSIS dengan undertone
                 val matchingShade = product.shades.find {
                     it.undertone.trim().equals(userUndertone.trim(), ignoreCase = true)
                 }
 
                 if (matchingShade != null) {
-                    recommendedList.add(Triple(brandObj.brand, product, matchingShade))
+                    if (product.category.equals("foundation", ignoreCase = true)) {
+                        foundationList.add(Triple(brandObj.brand, product, matchingShade))
+                    } else if (product.category.equals("lips", ignoreCase = true)) {
+                        lipsList.add(Triple(brandObj.brand, product, matchingShade))
+                    }
                 }
             }
         }
 
-        // Shuffled HANYA dilakukan sekali di sini, lalu disimpan ke state
-        filteredRecommendations = recommendedList.shuffled().take(5)
+        // Ambil maksimal 3 foundation acak dan 2 lips acak (Total tetap 5 rekomendasi)
+        val randomFoundations = foundationList.shuffled().take(3)
+        val randomLips = lipsList.shuffled().take(2)
+
+        // Gabungkan keduanya lalu acak posisinya di Home biar estetik
+        val finalCombinedList = (randomFoundations + randomLips).shuffled()
+
+        filteredRecommendations = finalCombinedList
     }
 
-    // Tambahkan fungsi ini untuk dipanggil saat user TEST ULANG
+
     fun resetRecommendations() {
-        filteredRecommendations = emptyList()
+        filteredRecommendations = kotlin.collections.emptyList()
         Log.d("MatchVM", "Recommendations has been reset for new test")
     }
 
+    // DIBAIKI: Fungsi ini awalnya dipanggil bebas, pastikan kamu selalu memakai getProductsByBrandAndCategory di screen list utama
     fun getProductsByBrand(brandName: String): List<Product> {
         val foundBrand = productsData.find { it.brand.trim().equals(brandName.trim(), ignoreCase = true) }
-        return foundBrand?.products ?: emptyList()
+        return foundBrand?.products ?: kotlin.collections.emptyList()
+    }
+
+    fun getProductsByBrandAndCategory(brandName: String, category: String): List<Product> {
+        val foundBrand = productsData.find { it.brand.trim().equals(brandName.trim(), ignoreCase = true) }
+        return foundBrand?.products?.filter { it.category.equals(category, ignoreCase = true) } ?: kotlin.collections.emptyList()
     }
 
     fun calculateColorDistance(hex1: String, hex2: String): Double {

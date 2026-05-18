@@ -1,5 +1,8 @@
-package com.example.matchUp.fdmatch
+package com.example.matchUp.lipsmatch
 
+import androidx.compose.runtime.setValue
+import com.example.matchUp.fdmatch.Product // Pastikan data class Product ini yang sudah ditambahkan field 'category'
+import com.example.matchUp.fdmatch.SegmentedProgressBar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,17 +23,22 @@ import androidx.compose.ui.unit.sp
 import com.example.matchUp.ui.theme.MyCustomFontFamily
 
 @Composable
-fun ProductSelectionScreen(
+fun LipsProductSelectionScreen(
     selectedBrandName: String,
-    productListFromDb: List<Product>,
+    productListFromDb: List<Product>, // Kumpulan data produk murni dari Brand terpilih
     onBack: () -> Unit,
     onNext: (Product) -> Unit
 ) {
     var showFullList by remember { mutableStateOf(false) }
     var selectedProduct by remember { mutableStateOf<Product?>(null) }
 
-    // --- ERROR STATE: If no products found in database ---
-    if (productListFromDb.isEmpty()) {
+    // --- LOGIKA FILTER: Ambil produk yang hanya berkategori "lips" ---
+    val lipsProductsOnly = remember(productListFromDb) {
+        productListFromDb.filter { it.category.equals("lips", ignoreCase = true) }
+    }
+
+    // --- ERROR STATE: Diganti menggunakan lipsProductsOnly agar akurat ---
+    if (lipsProductsOnly.isEmpty()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -65,10 +73,10 @@ fun ProductSelectionScreen(
         }
     } else {
         if (showFullList) {
-            ProductListScreen(
+            // --- SUDAH DIUBAH: Memanggil LipsProductListScreen khusus lips buatanmu nanti ---
+            LipsProductListScreen(
                 brandName = selectedBrandName,
-                // PERBAIKAN DI SINI: Diubah dari productList menjadi productListFromDb agar sinkron
-                productListFromDb = productListFromDb,
+                productList = lipsProductsOnly, // Mengirim data yang sudah difilter kategori lips
                 onProductSelected = { product ->
                     selectedProduct = product
                     showFullList = false
@@ -184,7 +192,7 @@ fun ProductSelectionScreen(
                     ) {
                         FloatingActionButton(
                             onClick = { onNext(selectedProduct!!) },
-                            containerColor = Color(0xFFFFD1E3),
+                            containerColor = Color(0xFFFFD1E3), // Warna pink khas lips
                             contentColor = Color.Black,
                             shape = CircleShape,
                             elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp),

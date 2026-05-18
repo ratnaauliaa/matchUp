@@ -27,12 +27,13 @@ import com.example.matchUp.ui.theme.MyCustomFontFamily
 fun HistoryScreen(
     viewModel: MatchViewModel,
     onBack: () -> Unit,
-    onNavigateToDetail: (Int) -> Unit
+    onNavigateToDetail: (Int) -> Unit,
+    // TAMBAHKAN PARAMETER BARU: Callback khusus untuk mengarahkan rute detail Lips
+    onNavigateToLipsDetail: (Int) -> Unit = {}
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
     val historyList = viewModel.historyList
 
-    // Root menggunakan Column + Background White (Tanpa Scaffold)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -41,7 +42,7 @@ fun HistoryScreen(
     ) {
         Spacer(modifier = Modifier.height(30.dp))
 
-        // --- TOP BAR (Identik dengan NotificationScreen) ---
+        // --- TOP BAR ---
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -70,7 +71,6 @@ fun HistoryScreen(
                 color = Color.Black
             )
 
-            // Tombol Clear (Jika ada isi) atau Spacer penyeimbang
             if (historyList.isNotEmpty()) {
                 TextButton(
                     onClick = { showDeleteDialog = true },
@@ -89,7 +89,6 @@ fun HistoryScreen(
             }
         }
 
-
         // --- CONTENT AREA ---
         Box(modifier = Modifier.fillMaxSize()) {
             if (historyList.isEmpty()) {
@@ -103,7 +102,18 @@ fun HistoryScreen(
                         HistoryGroupSection(
                             date = historyItem.date,
                             details = historyItem.details,
-                            onClick = { onNavigateToDetail(index) }
+                            onClick = {
+                                // DIBAIKI: Deteksi kategori produk di dalam data input secara dinamis sebelum bernavigasi
+                                val isLipsProduct = historyItem.inputProducts.any { matchData ->
+                                    matchData.product.category.equals("lips", ignoreCase = true)
+                                }
+
+                                if (isLipsProduct) {
+                                    onNavigateToLipsDetail(index)
+                                } else {
+                                    onNavigateToDetail(index)
+                                }
+                            }
                         )
                     }
                 }
@@ -111,7 +121,6 @@ fun HistoryScreen(
         }
     }
 
-    // Dialog tetap bisa dipanggil di luar Column karena bersifat Overlay
     if (showDeleteDialog) {
         ClearHistoryDialog(
             onDismiss = { showDeleteDialog = false },
@@ -128,7 +137,6 @@ fun HistoryGroupSection(date: String, details: List<String>, onClick: () -> Unit
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            // Ubah padding vertical menjadi hanya bottom agar tidak menumpuk di atas
             .padding(bottom = 20.dp, top = 10.dp)
             .clickable { onClick() }
     ) {
@@ -234,7 +242,6 @@ fun EmptyHistoryContent() {
     }
 }
 
-// Dialog tetap menggunakan Surface dengan warna Putih eksplisit
 @Composable
 fun ClearHistoryDialog(onDismiss: () -> Unit, onClearAll: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
