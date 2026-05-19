@@ -188,7 +188,7 @@ fun WishlistProductCard(product: Product, onRemove: () -> Unit, onClick: () -> U
                         contentDescription = null,
                         modifier = Modifier.size(85.dp),
                         contentScale = ContentScale.Fit,
-                        error = painterResource(id = R.drawable.history_empty)
+                        error = painterResource(id = R.drawable.kosong)
                     )
                 }
                 Surface(
@@ -239,7 +239,7 @@ fun WishlistProductListRow(product: Product, onRemove: () -> Unit, onClick: () -
 @Composable
 fun EmptyWishlistContent() {
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-        Image(painter = painterResource(id = R.drawable.history_empty), contentDescription = null, modifier = Modifier.size(180.dp))
+        Image(painter = painterResource(id = R.drawable.kosong), contentDescription = null, modifier = Modifier.size(180.dp))
         Spacer(modifier = Modifier.height(20.dp))
         Text("No Wishlist Yet", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black, fontFamily = MyCustomFontFamily)
         Text("Your favorite shades will show up here!", fontSize = 14.sp, color = Color.Gray, textAlign = TextAlign.Center, fontFamily = MyCustomFontFamily)

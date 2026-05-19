@@ -329,9 +329,6 @@ fun SetupNavGraph(
         composable("insights") {
             InsightsScreen(
                 viewModel = matchViewModel,
-                onNavigateToDetail = { articleId ->
-                    navController.navigate("article_detail/$articleId")
-                }
             )
         }
 

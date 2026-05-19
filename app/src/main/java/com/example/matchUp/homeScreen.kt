@@ -141,7 +141,7 @@ fun HomeScreen(
         Row(modifier = Modifier.fillMaxWidth()) {
             CategoryCard(
                 title = "Match Foundation",
-                imageRes = R.drawable.ic_fd,
+                imageRes = R.drawable.face,
                 containerColor = Color(0xFFFFD1E3),
                 modifier = Modifier.weight(1f),
                 onClick = {
@@ -155,7 +155,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.width(16.dp))
             CategoryCard(
                 title = "Match Lips",
-                imageRes = R.drawable.ic_lips,
+                imageRes = R.drawable.lips,
                 containerColor = Color(0xFFFFD1E3),
                 modifier = Modifier.weight(1f),
                 onClick = {
@@ -268,19 +268,19 @@ fun HomeScreen(
             ArticleCard(
                 title = "10 Tips on How To Choose Your Perfect Foundation Shade",
                 imageRes = R.drawable.img_shade,
-                onClick = onInsightClick
+                onClick = { navController.navigate("article_detail/1") }
             )
             Spacer(modifier = Modifier.width(16.dp))
             ArticleCard(
                 title = "How To Identify Your Skin Undertone",
                 imageRes = R.drawable.img_undertone,
-                onClick = onInsightClick
+                onClick = { navController.navigate("article_detail/2") }
             )
             Spacer(modifier = Modifier.width(16.dp))
             ArticleCard(
                 title = "4 Tips To Make Your Makeup Look Smooth",
                 imageRes = R.drawable.img_skin,
-                onClick = onInsightClick
+                onClick = onInsightClick // Sisa fallback dialihkan ke tab Insights utama
             )
         }
         Spacer(modifier = Modifier.height(20.dp))
@@ -395,7 +395,7 @@ fun ArticleCard(title: String, imageRes: Int, onClick: () -> Unit) {
                 .padding(12.dp),
             contentAlignment = Alignment.BottomStart
         ) {
-            Text(text = title, color = Color.White, fontSize = 14.sp,fontFamily = MyCustomFontFamily, fontWeight = FontWeight.Medium)
+            Text(text = title, color = Color.White, fontSize = 14.sp, fontFamily = MyCustomFontFamily, fontWeight = FontWeight.Medium)
         }
     }
 }

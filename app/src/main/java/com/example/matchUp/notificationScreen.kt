@@ -74,7 +74,7 @@ onBack: () -> Unit = {}
         ) {
 
             Image(
-                painter = painterResource(id = R.drawable.ic_notif),
+                painter = painterResource(id = R.drawable.notif),
                 contentDescription = null,
                 modifier = Modifier.size(220.dp)
             )

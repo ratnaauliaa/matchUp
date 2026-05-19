@@ -31,7 +31,6 @@ import com.example.matchUp.ui.theme.MyCustomFontFamily
 @Composable
 fun InsightsScreen(
     viewModel: MatchViewModel,
-    onNavigateToDetail: (Int) -> Unit
 ) {
     val categories = listOf("All", "Makeup", "Skin", "Tips")
     val articles = viewModel.getFilteredArticles()
@@ -122,7 +121,7 @@ fun InsightsScreen(
             items(articles) { article ->
                 ArticleCard(
                     article = article,
-                    onClick = { onNavigateToDetail(article.id) }
+                    onClick = {  }
                 )
                 HorizontalDivider(color = Color(0xFFF0F0F0), thickness = 1.dp)
             }

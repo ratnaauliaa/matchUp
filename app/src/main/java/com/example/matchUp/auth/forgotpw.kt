@@ -145,6 +145,8 @@ fun ForgotPW(
                                         errorMsg.contains("invalid", ignoreCase = true) -> "Invalid email format."
                                         errorMsg.contains("missing", ignoreCase = true) -> "Email is required!"
                                         errorMsg.contains("email", ignoreCase = true) -> "Invalid email format!"
+                                        errorMsg.contains("timeout", ignoreCase = true) -> "Request timed out. Please try again."
+                                        errorMsg.contains("too many", ignoreCase = true) -> "Too many requests. Try again later."
                                         errorMsg.contains("network", ignoreCase = true) -> "Network error. Check your connection."
                                         else -> "Failed to send reset link. Please try again."
                                     }

@@ -217,7 +217,7 @@ fun EmptyHistoryContent() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.history_empty),
+            painter = painterResource(id = R.drawable.kosong),
             contentDescription = null,
             modifier = Modifier.size(200.dp)
         )
